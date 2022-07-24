@@ -114,9 +114,9 @@ namespace IgnitionHelper
                         try
                         {
                             await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g);
-                            TB_Status.Text += $"\n Done checking!";
+                            TB_Status.Text += $"\n Done checking! There was aleady {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances ";
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
-                            TB_Status.Text += $"\n Done editing!";
+                            TB_Status.Text += $"\n Done editing! {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances done";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
                             doc_g.Save($"{newName}");
                             TB_Status.Text += $"\n Saved file: {newName}";
