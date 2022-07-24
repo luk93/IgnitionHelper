@@ -10,12 +10,13 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        public static async Task CreateTemplate(XmlDocument xmlDoc, XmlNode node, List<TemplateNode> output, StreamWriter streamWriter)
+        public static async Task CreateTemplate(XmlNode node, List<TemplateNode> output, StreamWriter streamWriter, string folderName)
         {
             if (output == null)
             {
                 output = new List<TemplateNode>();
             }
+            folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 if (childNode1.Name == "Tag")
@@ -24,15 +25,18 @@ namespace IgnitionHelper
                     {
                         if (childNode2.Name == "Property")
                         {
-                            XmlAttribute xmlAttribute = childNode2.Attributes["name"];
-                            if (xmlAttribute != null)
+                            if (folderName != "")
                             {
-                                if (xmlAttribute.Value == "typeId")
+                                XmlAttribute xmlAttribute = childNode2.Attributes["name"];
+                                if (xmlAttribute != null)
                                 {
-                                    if (!output.Exists(item => item.Name == childNode2.InnerText))
+                                    if (xmlAttribute.Value == "typeId")
                                     {
-                                        output.Add(new TemplateNode(childNode2.InnerText, childNode1));
-                                        streamWriter.WriteLine($"Added Template, name: {childNode2.InnerText}");
+                                        if (!output.Exists(item => item.Name == childNode2.InnerText))
+                                        {
+                                            output.Add(new TemplateNode(childNode2.InnerText, childNode1, folderName));
+                                            streamWriter.WriteLine($"Added Template, name: {childNode2.InnerText}, folderName; {folderName}");
+                                        }
                                     }
                                 }
                             }
@@ -42,10 +46,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CreateTemplate(xmlDoc, childNode1, output, streamWriter);
+                await CreateTemplate(childNode1, output, streamWriter, folderName);
             }
         }
-        public static async Task CheckXml(XmlDocument xmlDoc, XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter)
+        public static async Task CheckXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -69,32 +73,40 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CheckXml(xmlDoc, childNode1, tagDataList, tempNodeList, streamWriter);
+                await CheckXml(childNode1, tagDataList, tempNodeList, streamWriter);
             }
         }
-        public static async Task EditXml(XmlDocument xmlDoc, XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter)
+        public static async Task EditXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter, string folderName)
         {
+            folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
+                //Find correct folder, where same instances of data type are stored 
                 if (childNode1.Name == "Tag")
                 {
-                    XmlAttribute xmlAttribute = childNode1.Attributes["type"];
-                    if (xmlAttribute.Value == "Folder")
+                    XmlAttribute xmlAttribute1 = childNode1.Attributes["type"];
+                    XmlAttribute xmlAttribute2 = childNode1.Attributes["name"];
+                    if (xmlAttribute1 != null && xmlAttribute2 != null)
                     {
-                        XmlNode childNode2 = childNode1.FirstChild;
-                        foreach (TagData tagData in tagDataList)
+                        if (xmlAttribute1.Value == "UdtInstance")
                         {
-                            if (!tagData.IsAdded)
+                            if (folderName != "")
                             {
-                                //Hard set name to change
-                                tagData.IsAdded = true;
-                                TemplateNode tempNode = tempNodeList.Find(item => item.Name.Contains(tagData.DataType));
-                                if (tempNode != null)
+                                //Insert correct Instances from matching Template
+                                foreach (TagData tagData in tagDataList)
                                 {
-                                    XmlNode newNode = tempNode.Node.CloneNode(true);
-                                    tempNode.Node.Attributes["name"].Value = tagData.Name;
-                                    childNode2.InsertAfter(newNode, childNode2.FirstChild);
-                                    streamWriter.WriteLine($"Added Node: {tagData.Name}");
+                                    if (!tagData.IsAdded)
+                                    {
+                                        TemplateNode tempNode = tempNodeList.Find(item => (item.Name.Contains(tagData.DataType) && item.FolderName == folderName));
+                                        if (tempNode != null)
+                                        {
+                                            XmlNode newNode = tempNode.Node.CloneNode(true);
+                                            tempNode.Node.Attributes["name"].Value = tagData.Name;
+                                            node.InsertAfter(newNode, node.LastChild);
+                                            streamWriter.WriteLine($"Added Node: {tagData.Name}");
+                                            tagData.IsAdded = true;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -103,8 +115,26 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditXml(xmlDoc, childNode1, tagDataList, tempNodeList, streamWriter);
+                await EditXml(childNode1, tagDataList, tempNodeList, streamWriter, folderName);
             }
         }
+        private static string getFolderName(XmlNode xmlNode, string folderName)
+        {
+            string result = folderName;
+            if (xmlNode.Name == "Tag")
+            {
+                XmlAttribute xmlAttribute1 = xmlNode.Attributes["type"];
+                XmlAttribute xmlAttribute2 = xmlNode.Attributes["name"];
+                if (xmlAttribute1 != null && xmlAttribute2 != null)
+                {
+                    if (xmlAttribute1.Value == "Folder")
+                    {
+                        result = xmlAttribute2.Value;
+                    }
+                }
+            }
+            return result;
+        }
+       
     }
 }

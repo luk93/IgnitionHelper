@@ -101,7 +101,7 @@ namespace IgnitionHelper
                     doc_g.Load(xmlFile_g.FullName);
                     try
                     {
-                        await XmlOperations.CreateTemplate(doc_g, doc_g.DocumentElement, tempNodeList, textLogg_g);
+                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempNodeList, textLogg_g, null);
                         TB_Status.Text += $"\n Number of template nodes got: {tempNodeList.Count}";
                     }
                     catch (Exception ex)
@@ -113,9 +113,9 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g, doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g);
+                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g);
                             TB_Status.Text += $"\n Done checking!";
-                            await XmlOperations.EditXml(doc_g, doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g);
+                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
                             TB_Status.Text += $"\n Done editing!";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
                             doc_g.Save($"{newName}");
@@ -124,7 +124,6 @@ namespace IgnitionHelper
                             {
                                 textLogg_g.WriteLine($"name:{item.Name} dataType:{item.DataType} isAdded: {item.IsAdded}");
                             }
-                            textLogg_g.Close();
                         }
                         catch (Exception ex)
                         {
@@ -142,6 +141,7 @@ namespace IgnitionHelper
                     TB_Status.Text = "\n File not exist or in use!";
                 }
             }
+            textLogg_g.Close();
         }
         public static bool IsFileLocked(string filePath)
         {
