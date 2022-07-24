@@ -10,11 +10,13 @@ namespace IgnitionHelper
     public class TemplateNode
     {
         public string Name { get; set; }
+        public string FolderName { get; set; }
         public XmlNode Node { get; set; }
-        public TemplateNode(string name, XmlNode node)
+        public TemplateNode(string name, XmlNode node, string folderName)
         {
             Name = name;
-            Node = node;    
+            Node = node;
+            FolderName = folderName;
         }
     }
 }
