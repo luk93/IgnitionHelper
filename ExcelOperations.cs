@@ -24,7 +24,7 @@ namespace IgnitionHelper
                 {
                     if (!string.IsNullOrWhiteSpace(ws.Cells[row, col + 4].Value?.ToString()))
                     {
-                        if (ws.Cells[row, col + 4].Value.ToString().Contains("ud_Pf_Alarm8"))
+                        if (ws.Cells[row, col + 4].Value.ToString().Contains("ud_"))
                         {
                             TagData newObj = new TagData();
                             newObj.DataType = (ws.Cells[row, col + 4].Value.ToString().Substring(3, ws.Cells[row, col + 4].Value.ToString().Length-3));
