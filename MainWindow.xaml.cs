@@ -24,7 +24,7 @@ namespace IgnitionHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        FileInfo csvFile_g;
+        FileInfo tagsFile_g;
         FileInfo xmlFile_g;
         XmlDocument doc_g;
         public static StreamWriter textLogg_g;
@@ -55,15 +55,15 @@ namespace IgnitionHelper
             };
             if (openFileDialog1.ShowDialog() == true)
             {
-                csvFile_g = new FileInfo(openFileDialog1.FileName);
-                if (csvFile_g.Exists && !IsFileLocked(csvFile_g.FullName))
+                tagsFile_g = new FileInfo(openFileDialog1.FileName);
+                if (tagsFile_g.Exists && !IsFileLocked(tagsFile_g.FullName))
                 {
-                    L_TagsCsvPath.Content = $"{csvFile_g.FullName}";
-                    TB_Status.Text += $"\n Selected: {csvFile_g.FullName}";
-                    textLogg_g = new StreamWriter($"{csvFile_g.FullName}_textLogg.txt");
+                    L_TagsCsvPath.Content = $"{tagsFile_g.FullName}";
+                    TB_Status.Text += $"\n Selected: {tagsFile_g.FullName}";
+                    textLogg_g = new StreamWriter($"{tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.Length - 5)}_textLogg.txt");
                     try
                     {
-                        tagDataList = await ExcelOperations.loadFromExcelFile(csvFile_g);
+                        tagDataList = await ExcelOperations.loadFromExcelFile(tagsFile_g);
                         TB_Status.Text += $"\n Acquired {tagDataList.Count.ToString()} tags";
                     }
                     catch (Exception ex)
@@ -113,7 +113,7 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g,null);
+                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
                             TB_Status.Text += $"\n Done checking! There was aleady {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances ";
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
                             TB_Status.Text += $"\n Done editing! {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances done";
@@ -165,6 +165,21 @@ namespace IgnitionHelper
                 var folderCount = tagDataList.Count(tagData => tagData.FolderName == folderName && tagData.IsAdded);
                 textBlock.Text += $"\n Folder name: {folderName} count: {folderCount}";
             }
+        }
+        private async void B_GenExcelTagData_Click(object sender, RoutedEventArgs e)
+        {
+            String filePath = tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.LastIndexOf(@"\")) + @"\TagDataExport.xlsx";
+            var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
+            if (excelPackage == null)
+            {
+                TB_Status.Text += "Failed to create (.xlsx) file!";
+                return;
+            }
+            var ws = excelPackage.Workbook.Worksheets.Add("Tag Data List");
+            var range = ws.Cells["A1"].LoadFromCollection(tagDataList, true);
+            range.AutoFitColumns();
+            await ExcelOperations.SaveExcelFile(excelPackage);
+            TB_Status.Text += $"\n Created file : {filePath}";
         }
     }
 }

@@ -37,5 +37,28 @@ namespace IgnitionHelper
             }
             return output;
         }
+        public static ExcelPackage CreateExcelFile(string path, StreamWriter streamWriter)
+        {
+            var file = new FileInfo(path);
+            if (file.Exists)
+            {
+                try
+                {
+                    file.Delete();
+                }
+                catch (Exception e)
+                {
+                    streamWriter.WriteLine($"Error trying to create excel file: {e.Message}");
+                    return null;
+                }
+            }
+            return new ExcelPackage(file);
+        }
+        public static async Task SaveExcelFile(ExcelPackage excelPackage)
+        {
+            await excelPackage.SaveAsync();
+            excelPackage.Dispose();
+        }
     }
+   
 }

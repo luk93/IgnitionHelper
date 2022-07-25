@@ -15,18 +15,18 @@
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20*"/>
-            <RowDefinition Height="20*"/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="60*"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
         <Button Name ="B_SelectTagsXLSX" Grid.Row="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Center" Margin="0,14,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_Click" Height="30"/>
         <Label Name ="L_TagsCsvPath" Grid.Column="1" Content="XLSX file path" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="573" Height="28"/>
-        <ComboBox Name="CoB_Folder" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="573"/>
         <Button Name ="B_GenerateXml" Content="Generate XML" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Width="140" Height="30" Click="B_GenerateXml_Click"/>
         <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2" Margin="10,0,10,10" CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
             <TextBlock Name= "TB_Status"  TextWrapping="Wrap"  Height="auto" Width="auto" ><Run Language="pl-pl" Text="Status"/><LineBreak/><Run Language="pl-pl"/></TextBlock>
         </ScrollViewer>
+        <Button x:Name ="B_GenExcelTagData" Content="Generate TagData (.xlsx)" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Width="140" Height="30" Click="B_GenExcelTagData_Click"/>
     </Grid>
 </Window>
