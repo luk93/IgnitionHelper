@@ -25,7 +25,7 @@ namespace IgnitionHelper
                     {
                         if (childNode2.Name == "Property")
                         {
-                            if (folderName != "")
+                            if (!String.IsNullOrEmpty(folderName))
                             {
                                 XmlAttribute xmlAttribute = childNode2.Attributes["name"];
                                 if (xmlAttribute != null)
@@ -49,8 +49,9 @@ namespace IgnitionHelper
                 await CreateTemplate(childNode1, output, streamWriter, folderName);
             }
         }
-        public static async Task CheckXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter)
+        public static async Task CheckXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter, string folderName)
         {
+            folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 if (childNode1.Name == "Tag")
@@ -59,13 +60,17 @@ namespace IgnitionHelper
                     XmlAttribute xmlAttribute2 = childNode1.Attributes["name"];
                     if (xmlAttribute1 != null && xmlAttribute2 != null)
                     {
-                        if (xmlAttribute1.Value == "UdtInstance")
+                        if (!String.IsNullOrEmpty(folderName))
                         {
-                            TagData tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
-                            if (tagData != null)
+                            if (xmlAttribute1.Value == "UdtInstance")
                             {
-                                tagData.IsAdded = true;
-                                streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded");
+                                TagData tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
+                                if (tagData != null)
+                                {
+                                    tagData.IsAdded = true;
+                                    tagData.FolderName = folderName;
+                                    streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded");
+                                }
                             }
                         }
                     }
@@ -73,7 +78,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CheckXml(childNode1, tagDataList, tempNodeList, streamWriter);
+                await CheckXml(childNode1, tagDataList, tempNodeList, streamWriter, folderName);
             }
         }
         public static async Task EditXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter, string folderName)
@@ -90,7 +95,7 @@ namespace IgnitionHelper
                     {
                         if (xmlAttribute1.Value == "UdtInstance")
                         {
-                            if (folderName != "")
+                            if (!String.IsNullOrEmpty(folderName))
                             {
                                 //Insert correct Instances from matching Template
                                 foreach (TagData tagData in tagDataList)
@@ -105,6 +110,7 @@ namespace IgnitionHelper
                                             node.InsertAfter(newNode, node.LastChild);
                                             streamWriter.WriteLine($"Added Node: {tagData.Name}");
                                             tagData.IsAdded = true;
+                                            tagData.FolderName = folderName;
                                         }
                                     }
                                 }

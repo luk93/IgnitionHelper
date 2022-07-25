@@ -113,16 +113,17 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g);
+                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g,null);
                             TB_Status.Text += $"\n Done checking! There was aleady {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances ";
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
                             TB_Status.Text += $"\n Done editing! {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances done";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
                             doc_g.Save($"{newName}");
+                            GetFoldersInfo(tagDataList, TB_Status);
                             TB_Status.Text += $"\n Saved file: {newName}";
                             foreach (var item in tagDataList)
                             {
-                                textLogg_g.WriteLine($"name:{item.Name} dataType:{item.DataType} isAdded: {item.IsAdded}");
+                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataType};folderName:{item.FolderName};isAdded:{item.IsAdded}");
                             }
                         }
                         catch (Exception ex)
@@ -153,6 +154,16 @@ namespace IgnitionHelper
             catch (IOException)
             {
                 return true;
+            }
+        }
+        public static void GetFoldersInfo(List<TagData> tagDataList, TextBlock textBlock)
+        {
+            List<string> folderNames = tagDataList.Select(s => s.FolderName).Distinct().ToList();
+
+            foreach (string folderName in folderNames)
+            {
+                var folderCount = tagDataList.Count(tagData => tagData.FolderName == folderName && tagData.IsAdded);
+                textBlock.Text += $"\n Folder name: {folderName} count: {folderCount}";
             }
         }
     }

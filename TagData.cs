@@ -11,17 +11,20 @@ namespace IgnitionHelper
         public string Name { get; set; }
         public string DataType { get; set; }
         public bool IsAdded { get; set; }
+        public string FolderName { get; set; }
         public TagData()
         {
             Name = "";
             DataType = "";
             IsAdded = false;
+            FolderName = "";
         }
         public TagData(string name, string dataType)
         {
             Name = name;
             DataType = dataType;
             IsAdded = false;
+            FolderName = "";
         }
     }
 }
