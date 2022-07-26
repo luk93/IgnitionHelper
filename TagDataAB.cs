@@ -6,20 +6,21 @@ using System.Threading.Tasks;
 
 namespace IgnitionHelper
 {
-    public class TagData
+    //Tag Data Allan Bradley
+    public class TagDataAB
     {
         public string Name { get; set; }
         public string DataType { get; set; }
         public bool IsAdded { get; set; }
         public string FolderName { get; set; }
-        public TagData()
+        public TagDataAB()
         {
             Name = "";
             DataType = "";
             IsAdded = false;
             FolderName = "";
         }
-        public TagData(string name, string dataType)
+        public TagDataAB(string name, string dataType)
         {
             Name = name;
             DataType = dataType;

@@ -21,12 +21,71 @@
             <RowDefinition Height="60*"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <Button Name ="B_SelectTagsXLSX" Grid.Row="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Center" Margin="0,14,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_Click" Height="30"/>
-        <Label Name ="L_TagsCsvPath" Grid.Column="1" Content="XLSX file path" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="573" Height="28"/>
-        <Button Name ="B_GenerateXml" Content="Generate XML" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Width="140" Height="30" Click="B_GenerateXml_Click"/>
+        <Label Name ="L_TagsCsvPath" Grid.Column="1" Content="XLSX file path" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="573" Height="28" Grid.ColumnSpan="4" Margin="61,-71,0,0"/>
         <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2" Margin="10,0,10,10" CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
             <TextBlock Name= "TB_Status"  TextWrapping="Wrap"  Height="auto" Width="auto" ><Run Language="pl-pl" Text="Status"/><LineBreak/><Run Language="pl-pl"/></TextBlock>
         </ScrollViewer>
-        <Button x:Name ="B_GenExcelTagData" Content="Generate TagData (.xlsx)" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Width="140" Height="30" Click="B_GenExcelTagData_Click"/>
+        <TabControl Grid.ColumnSpan="2" Margin="10,10,10,10" Grid.RowSpan="3">
+            <TabItem Header="DataTypeInstance">
+                <Grid>
+                    <Grid.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FF9EA2A1"/>
+                            <GradientStop Color="White" Offset="1"/>
+                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="99*"/>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="48*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="590*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name ="B_SelectTagsXLSX" Grid.Row="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_Click" Height="30" Grid.ColumnSpan="3">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Label x:Name ="L_TagsCsvPath_Copy" Content="XLSX file path" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="589" Height="28" Margin="19,12,0,0" Grid.Column="3" Grid.ColumnSpan="2"/>
+                    <Button x:Name ="B_GenerateXml" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="30" Click="B_GenerateXml_Click" Margin="10,47,0,0" Grid.ColumnSpan="3">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button x:Name ="B_GenExcelTagData" Content="Generate TagData (.xlsx)" HorizontalAlignment="Left" Grid.Column="0" VerticalAlignment="Top" Width="140" Height="30" Click="B_GenExcelTagData_Click" Margin="10,82,0,0" Grid.ColumnSpan="3">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </Grid>
+            </TabItem>
+            <TabItem Header="DataTypeDefinition">
+                <TabItem.Background>
+                    <LinearGradientBrush EndPoint="0,1">
+                        <GradientStop Color="#FFF0F0F0"/>
+                        <GradientStop Color="#FFB5A3A3" Offset="1"/>
+                    </LinearGradientBrush>
+                </TabItem.Background>
+                <Grid>
+                    <Grid.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FF9EA2A1"/>
+                            <GradientStop Color="White" Offset="1"/>
+                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

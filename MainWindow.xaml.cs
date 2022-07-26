@@ -28,15 +28,15 @@ namespace IgnitionHelper
         FileInfo xmlFile_g;
         XmlDocument doc_g;
         public static StreamWriter textLogg_g;
-        List<TagData> tagDataList;
-        List<TemplateNode> tempNodeList;
+        List<TagDataAB> tagDataABList;
+        List<TempInstanceIgni> tempInstList;
         public static int PB_Progress;
         public MainWindow()
         {
             InitializeComponent();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            tagDataList = new List<TagData>();
-            tempNodeList = new List<TemplateNode>();
+            tagDataABList = new List<TagDataAB>();
+            tempInstList = new List<TempInstanceIgni>();
             doc_g = new XmlDocument();
         }
         private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
@@ -63,8 +63,8 @@ namespace IgnitionHelper
                     textLogg_g = new StreamWriter($"{tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.Length - 5)}_textLogg.txt");
                     try
                     {
-                        tagDataList = await ExcelOperations.loadFromExcelFile(tagsFile_g);
-                        TB_Status.Text += $"\n Acquired {tagDataList.Count.ToString()} tags";
+                        tagDataABList = await ExcelOperations.loadFromExcelFile(tagsFile_g);
+                        TB_Status.Text += $"\n Acquired {tagDataABList.Count.ToString()} tags";
                     }
                     catch (Exception ex)
                     {
@@ -101,27 +101,27 @@ namespace IgnitionHelper
                     doc_g.Load(xmlFile_g.FullName);
                     try
                     {
-                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempNodeList, textLogg_g, null);
-                        TB_Status.Text += $"\n Number of template nodes got: {tempNodeList.Count}";
+                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null);
+                        TB_Status.Text += $"\n Number of template nodes got: {tempInstList.Count}";
                     }
                     catch (Exception ex)
                     {
                         TB_Status.Text = $"\n {ex.Message}";
                         TB_Status.Text += $"\n {ex.StackTrace}";
                     }
-                    if (tempNodeList.Count > 0)
+                    if (tempInstList.Count > 0)
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
-                            TB_Status.Text += $"\n Done checking! There was aleady {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances ";
-                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataList, tempNodeList, textLogg_g, null);
-                            TB_Status.Text += $"\n Done editing! {tagDataList.Count(item => item.IsAdded)}/{tagDataList.Count} instances done";
+                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataABList, textLogg_g, null);
+                            TB_Status.Text += $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ";
+                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null);
+                            TB_Status.Text += $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
                             doc_g.Save($"{newName}");
-                            GetFoldersInfo(tagDataList, TB_Status);
+                            GetFoldersInfo(tagDataABList, TB_Status);
                             TB_Status.Text += $"\n Saved file: {newName}";
-                            foreach (var item in tagDataList)
+                            foreach (var item in tagDataABList)
                             {
                                 textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataType};folderName:{item.FolderName};isAdded:{item.IsAdded}");
                             }
@@ -156,7 +156,7 @@ namespace IgnitionHelper
                 return true;
             }
         }
-        public static void GetFoldersInfo(List<TagData> tagDataList, TextBlock textBlock)
+        public static void GetFoldersInfo(List<TagDataAB> tagDataList, TextBlock textBlock)
         {
             List<string> folderNames = tagDataList.Select(s => s.FolderName).Distinct().ToList();
 
@@ -176,7 +176,7 @@ namespace IgnitionHelper
                 return;
             }
             var ws = excelPackage.Workbook.Worksheets.Add("Tag Data List");
-            var range = ws.Cells["A1"].LoadFromCollection(tagDataList, true);
+            var range = ws.Cells["A1"].LoadFromCollection(tagDataABList, true);
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
             TB_Status.Text += $"\n Created file : {filePath}";

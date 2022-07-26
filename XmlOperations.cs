@@ -10,11 +10,11 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        public static async Task CreateTemplate(XmlNode node, List<TemplateNode> output, StreamWriter streamWriter, string folderName)
+        public static async Task CreateTemplate(XmlNode node, List<TempInstanceIgni> output, StreamWriter streamWriter, string folderName)
         {
             if (output == null)
             {
-                output = new List<TemplateNode>();
+                output = new List<TempInstanceIgni>();
             }
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -34,7 +34,7 @@ namespace IgnitionHelper
                                     {
                                         if (!output.Exists(item => item.Name == childNode2.InnerText))
                                         {
-                                            output.Add(new TemplateNode(childNode2.InnerText, childNode1, folderName));
+                                            output.Add(new TempInstanceIgni(childNode2.InnerText, childNode1, folderName));
                                             streamWriter.WriteLine($"Added Template, name: {childNode2.InnerText}, folderName; {folderName}");
                                         }
                                     }
@@ -49,7 +49,7 @@ namespace IgnitionHelper
                 await CreateTemplate(childNode1, output, streamWriter, folderName);
             }
         }
-        public static async Task CheckXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter, string folderName)
+        public static async Task CheckXml(XmlNode node, List<TagDataAB> tagDataList, StreamWriter streamWriter, string folderName)
         {
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -64,7 +64,7 @@ namespace IgnitionHelper
                         {
                             if (xmlAttribute1.Value == "UdtInstance")
                             {
-                                TagData tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
+                                TagDataAB tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
                                 if (tagData != null)
                                 {
                                     tagData.IsAdded = true;
@@ -78,10 +78,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CheckXml(childNode1, tagDataList, tempNodeList, streamWriter, folderName);
+                await CheckXml(childNode1, tagDataList, streamWriter, folderName);
             }
         }
-        public static async Task EditXml(XmlNode node, List<TagData> tagDataList, List<TemplateNode> tempNodeList, StreamWriter streamWriter, string folderName)
+        public static async Task EditXml(XmlNode node, List<TagDataAB> tagDataList, List<TempInstanceIgni> tempInstList, StreamWriter streamWriter, string folderName)
         {
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -98,15 +98,15 @@ namespace IgnitionHelper
                             if (!String.IsNullOrEmpty(folderName))
                             {
                                 //Insert correct Instances from matching Template
-                                foreach (TagData tagData in tagDataList)
+                                foreach (TagDataAB tagData in tagDataList)
                                 {
                                     if (!tagData.IsAdded)
                                     {
-                                        TemplateNode tempNode = tempNodeList.Find(item => (item.Name.Contains(tagData.DataType) && item.FolderName == folderName));
-                                        if (tempNode != null)
+                                        TempInstanceIgni tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataType) && item.FolderName == folderName));
+                                        if (tempInst != null)
                                         {
-                                            XmlNode newNode = tempNode.Node.CloneNode(true);
-                                            tempNode.Node.Attributes["name"].Value = tagData.Name;
+                                            XmlNode newNode = tempInst.Node.CloneNode(true);
+                                            tempInst.Node.Attributes["name"].Value = tagData.Name;
                                             node.InsertAfter(newNode, node.LastChild);
                                             streamWriter.WriteLine($"Added Node: {tagData.Name}");
                                             tagData.IsAdded = true;
@@ -121,7 +121,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditXml(childNode1, tagDataList, tempNodeList, streamWriter, folderName);
+                await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName);
             }
         }
         private static string getFolderName(XmlNode xmlNode, string folderName)
