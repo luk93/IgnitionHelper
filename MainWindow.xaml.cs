@@ -58,7 +58,6 @@ namespace IgnitionHelper
                 tagsFile_g = new FileInfo(openFileDialog1.FileName);
                 if (tagsFile_g.Exists && !IsFileLocked(tagsFile_g.FullName))
                 {
-                    L_TagsCsvPath.Content = $"{tagsFile_g.FullName}";
                     TB_Status.Text += $"\n Selected: {tagsFile_g.FullName}";
                     textLogg_g = new StreamWriter($"{tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.Length - 5)}_textLogg.txt");
                     try

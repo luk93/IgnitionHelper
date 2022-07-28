@@ -80,7 +80,8 @@ namespace IgnitionHelper
                                                 string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
                                                 if (name != null)
                                                 {
-                                                    if (name.Contains(tagData.DataTypePLC))
+                                                    //string tolerance is both side:
+                                                    if ((StringExt.Contains(name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, name, StringComparison.OrdinalIgnoreCase)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
@@ -132,7 +133,9 @@ namespace IgnitionHelper
                                 {
                                     if (!tagData.IsAdded)
                                     {
-                                        TempInstanceVisu tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataTypePLC) && item.FolderName == folderName));
+                                        //tolerance in names extended
+                                        TempInstanceVisu tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name,tagData.DataTypePLC,StringComparison.OrdinalIgnoreCase) ||
+                                                                                            StringExt.Contains(tagData.DataTypePLC, item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
                                         if (tempInst != null)
                                         {
                                             XmlNode newNode = tempInst.Node.CloneNode(true);
@@ -140,6 +143,8 @@ namespace IgnitionHelper
                                             node.InsertAfter(newNode, node.LastChild);
                                             streamWriter.WriteLine($"Added Node: {tagData.Name}");
                                             tagData.IsAdded = true;
+                                            tagData.IsCorrect = true;
+                                            tagData.DataTypeVisu = tempInst.Name;
                                             tagData.FolderName = folderName;
                                         }
                                     }
@@ -171,6 +176,5 @@ namespace IgnitionHelper
             }
             return result;
         }
-
     }
 }
