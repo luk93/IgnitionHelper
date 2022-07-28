@@ -77,6 +77,11 @@
                     </LinearGradientBrush>
                 </TabItem.Background>
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="23*"/>
+                        <ColumnDefinition Width="75*"/>
+                        <ColumnDefinition Width="289*"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#FF9EA2A1"/>
@@ -84,6 +89,23 @@
                             <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
+                    <Button x:Name ="B_GetDTFromIgni" Grid.Row="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="140" Height="30" Grid.ColumnSpan="2" Click="B_GetDTFromIgni_Click">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button x:Name ="B_GetDTFromAB" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="30" Margin="10,47,0,0" Grid.ColumnSpan="2" Click="B_GetDTFromAB_Click">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+
                 </Grid>
             </TabItem>
         </TabControl>

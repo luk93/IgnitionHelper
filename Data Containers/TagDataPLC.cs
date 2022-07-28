@@ -6,25 +6,30 @@ using System.Threading.Tasks;
 
 namespace IgnitionHelper
 {
-    //Tag Data Allan Bradley
-    public class TagDataAB
+    //Tag Data Allan Bradley PLC
+    public class TagDataPLC
     {
         public string Name { get; set; }
-        public string DataType { get; set; }
+        public string DataTypePLC { get; set; }
+        public string DataTypeVisu { get; set; }
         public bool IsAdded { get; set; }
+        public bool IsCorrect { get; set; }
         public string FolderName { get; set; }
-        public TagDataAB()
+        public TagDataPLC()
         {
             Name = "";
-            DataType = "";
+            DataTypePLC = "";
+            DataTypeVisu = "";
             IsAdded = false;
+            IsCorrect = false;
             FolderName = "";
         }
-        public TagDataAB(string name, string dataType)
+        public TagDataPLC(string name, string dataTypePLC, string dataTypeVisu)
         {
             Name = name;
-            DataType = dataType;
+            DataTypePLC = dataTypePLC;
             IsAdded = false;
+            IsCorrect = false;
             FolderName = "";
         }
     }

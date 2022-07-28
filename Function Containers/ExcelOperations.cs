@@ -10,9 +10,9 @@ namespace IgnitionHelper
 {
     public static class ExcelOperations
     {
-        public static async Task<List<TagDataAB>> loadFromExcelFile(FileInfo file)
+        public static async Task<List<TagDataPLC>> loadFromExcelFile(FileInfo file)
         {
-            List<TagDataAB> output = new List<TagDataAB>();
+            List<TagDataPLC> output = new List<TagDataPLC>();
             var package = new ExcelPackage(file);
             await package.LoadAsync(file);
             var ws = package.Workbook.Worksheets[0];
@@ -26,8 +26,8 @@ namespace IgnitionHelper
                     {
                         if (ws.Cells[row, col + 4].Value.ToString().Contains("ud_"))
                         {
-                            TagDataAB newObj = new TagDataAB();
-                            newObj.DataType = (ws.Cells[row, col + 4].Value.ToString().Substring(3, ws.Cells[row, col + 4].Value.ToString().Length-3));
+                            TagDataPLC newObj = new TagDataPLC();
+                            newObj.DataTypePLC = (ws.Cells[row, col + 4].Value.ToString());
                             newObj.Name = (ws.Cells[row, col + 2].Value.ToString());
                             output.Add(newObj);
                         }

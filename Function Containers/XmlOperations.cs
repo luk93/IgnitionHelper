@@ -10,11 +10,11 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        public static async Task CreateTemplate(XmlNode node, List<TempInstanceIgni> output, StreamWriter streamWriter, string folderName)
+        public static async Task CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName)
         {
             if (output == null)
             {
-                output = new List<TempInstanceIgni>();
+                output = new List<TempInstanceVisu>();
             }
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -32,10 +32,11 @@ namespace IgnitionHelper
                                 {
                                     if (xmlAttribute.Value == "typeId")
                                     {
-                                        if (!output.Exists(item => item.Name == childNode2.InnerText))
+                                        string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                                        if (!output.Exists(item => item.Name == name))
                                         {
-                                            output.Add(new TempInstanceIgni(childNode2.InnerText, childNode1, folderName));
-                                            streamWriter.WriteLine($"Added Template, name: {childNode2.InnerText}, folderName; {folderName}");
+                                            output.Add(new TempInstanceVisu(name, childNode1, folderName));
+                                            streamWriter.WriteLine($"Added Template, name: {name}, folderName; {folderName}");
                                         }
                                     }
                                 }
@@ -49,7 +50,7 @@ namespace IgnitionHelper
                 await CreateTemplate(childNode1, output, streamWriter, folderName);
             }
         }
-        public static async Task CheckXml(XmlNode node, List<TagDataAB> tagDataList, StreamWriter streamWriter, string folderName)
+        public static async Task CheckXml(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName)
         {
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -64,12 +65,41 @@ namespace IgnitionHelper
                         {
                             if (xmlAttribute1.Value == "UdtInstance")
                             {
-                                TagDataAB tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
+                                //Search for Instance Of Data Block in Xml by the Name got from Excel
+                                TagDataPLC tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
                                 if (tagData != null)
                                 {
-                                    tagData.IsAdded = true;
-                                    tagData.FolderName = folderName;
-                                    streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded");
+                                    //Search for Instance Of Data Block Data Type in Xml by the Data Type got from Excel
+                                    foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                                    {
+                                        if (childNode2.Name == "Property")
+                                        {
+                                            XmlAttribute xmlAttribute = childNode2.Attributes["name"];
+                                            if (xmlAttribute != null && xmlAttribute.Value == "typeId")
+                                            {
+                                                string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                                                if (name != null)
+                                                {
+                                                    if (name.Contains(tagData.DataTypePLC))
+                                                    {
+                                                        tagData.IsAdded = true;
+                                                        tagData.IsCorrect = true;
+                                                        tagData.FolderName = folderName;
+                                                        tagData.DataTypeVisu = name;
+                                                        streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and Correct");
+                                                    }
+                                                    else
+                                                    {
+                                                        tagData.IsAdded = true;
+                                                        tagData.IsCorrect = false;
+                                                        tagData.FolderName = folderName;
+                                                        tagData.DataTypeVisu = name;
+                                                        streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and NOT Correct");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -81,7 +111,7 @@ namespace IgnitionHelper
                 await CheckXml(childNode1, tagDataList, streamWriter, folderName);
             }
         }
-        public static async Task EditXml(XmlNode node, List<TagDataAB> tagDataList, List<TempInstanceIgni> tempInstList, StreamWriter streamWriter, string folderName)
+        public static async Task EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName)
         {
             folderName = getFolderName(node, folderName);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -98,11 +128,11 @@ namespace IgnitionHelper
                             if (!String.IsNullOrEmpty(folderName))
                             {
                                 //Insert correct Instances from matching Template
-                                foreach (TagDataAB tagData in tagDataList)
+                                foreach (TagDataPLC tagData in tagDataList)
                                 {
                                     if (!tagData.IsAdded)
                                     {
-                                        TempInstanceIgni tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataType) && item.FolderName == folderName));
+                                        TempInstanceVisu tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataTypePLC) && item.FolderName == folderName));
                                         if (tempInst != null)
                                         {
                                             XmlNode newNode = tempInst.Node.CloneNode(true);
@@ -141,6 +171,6 @@ namespace IgnitionHelper
             }
             return result;
         }
-       
+
     }
 }

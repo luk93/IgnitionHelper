@@ -28,15 +28,15 @@ namespace IgnitionHelper
         FileInfo xmlFile_g;
         XmlDocument doc_g;
         public static StreamWriter textLogg_g;
-        List<TagDataAB> tagDataABList;
-        List<TempInstanceIgni> tempInstList;
+        List<TagDataPLC> tagDataABList;
+        List<TempInstanceVisu> tempInstList;
         public static int PB_Progress;
         public MainWindow()
         {
             InitializeComponent();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            tagDataABList = new List<TagDataAB>();
-            tempInstList = new List<TempInstanceIgni>();
+            tagDataABList = new List<TagDataPLC>();
+            tempInstList = new List<TempInstanceVisu>();
             doc_g = new XmlDocument();
         }
         private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
@@ -118,12 +118,13 @@ namespace IgnitionHelper
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null);
                             TB_Status.Text += $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
+                            TB_Status.Text += $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}";
                             doc_g.Save($"{newName}");
                             GetFoldersInfo(tagDataABList, TB_Status);
                             TB_Status.Text += $"\n Saved file: {newName}";
                             foreach (var item in tagDataABList)
                             {
-                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataType};folderName:{item.FolderName};isAdded:{item.IsAdded}");
+                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.FolderName};isAdded:{item.IsAdded}");
                             }
                         }
                         catch (Exception ex)
@@ -156,7 +157,7 @@ namespace IgnitionHelper
                 return true;
             }
         }
-        public static void GetFoldersInfo(List<TagDataAB> tagDataList, TextBlock textBlock)
+        public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
             List<string> folderNames = tagDataList.Select(s => s.FolderName).Distinct().ToList();
 
@@ -180,6 +181,16 @@ namespace IgnitionHelper
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
             TB_Status.Text += $"\n Created file : {filePath}";
+        }
+
+        private void B_GetDTFromIgni_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void B_GetDTFromAB_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
