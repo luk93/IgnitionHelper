@@ -10,13 +10,14 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        public static async Task CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName)
+        public static async Task CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
         {
             if (output == null)
             {
                 output = new List<TempInstanceVisu>();
             }
-            folderName = getFolderName(node, folderName);
+            path = getPath(node, path);
+            folderName = getFolderName(path);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 if (childNode1.Name == "Tag")
@@ -35,7 +36,7 @@ namespace IgnitionHelper
                                         string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
                                         if (!output.Exists(item => item.Name == name))
                                         {
-                                            output.Add(new TempInstanceVisu(name, childNode1, folderName));
+                                            output.Add(new TempInstanceVisu(name, childNode1, folderName, path));
                                             streamWriter.WriteLine($"Added Template, name: {name}, folderName; {folderName}");
                                         }
                                     }
@@ -47,12 +48,14 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CreateTemplate(childNode1, output, streamWriter, folderName);
+                await CreateTemplate(childNode1, output, streamWriter, folderName, path);
             }
         }
-        public static async Task CheckXml(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName)
+        public static async Task CheckXml(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
-            folderName = getFolderName(node, folderName);
+            path = getPath(node, path);
+            folderName = getFolderName(path);
+
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 if (childNode1.Name == "Tag")
@@ -85,7 +88,8 @@ namespace IgnitionHelper
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
-                                                        tagData.FolderName = folderName;
+                                                        tagData.VisuFolderName = folderName;
+                                                        tagData.VisuPath = path;
                                                         tagData.DataTypeVisu = name;
                                                         streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and Correct");
                                                     }
@@ -93,7 +97,8 @@ namespace IgnitionHelper
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = false;
-                                                        tagData.FolderName = folderName;
+                                                        tagData.VisuFolderName = folderName;
+                                                        tagData.VisuPath = path;
                                                         tagData.DataTypeVisu = name;
                                                         streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and NOT Correct");
                                                     }
@@ -109,12 +114,13 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CheckXml(childNode1, tagDataList, streamWriter, folderName);
+                await CheckXml(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName)
+        public static async Task EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
         {
-            folderName = getFolderName(node, folderName);
+            path = getPath(node, path);
+            folderName = getFolderName(path);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 //Find correct folder, where same instances of data type are stored 
@@ -145,7 +151,8 @@ namespace IgnitionHelper
                                             tagData.IsAdded = true;
                                             tagData.IsCorrect = true;
                                             tagData.DataTypeVisu = tempInst.Name;
-                                            tagData.FolderName = folderName;
+                                            tagData.VisuFolderName = folderName;
+                                            tagData.VisuPath = path;
                                         }
                                     }
                                 }
@@ -156,12 +163,19 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName);
+                await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        private static string getFolderName(XmlNode xmlNode, string folderName)
+        private static string getFolderName(string path)
         {
-            string result = folderName;
+            string output = "";
+            if (!String.IsNullOrEmpty(path))
+                output = path.Substring(path.LastIndexOf(@"/") + 1, path.Length - path.LastIndexOf(@"/") - 1);
+            return output;
+        }
+        private static string getPath(XmlNode xmlNode, string path)
+        {
+            string result = path;
             if (xmlNode.Name == "Tag")
             {
                 XmlAttribute xmlAttribute1 = xmlNode.Attributes["type"];
@@ -170,7 +184,7 @@ namespace IgnitionHelper
                 {
                     if (xmlAttribute1.Value == "Folder")
                     {
-                        result = xmlAttribute2.Value;
+                        result += $@"/{xmlAttribute2.Value}";
                     }
                 }
             }

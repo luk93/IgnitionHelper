@@ -100,7 +100,7 @@ namespace IgnitionHelper
                     doc_g.Load(xmlFile_g.FullName);
                     try
                     {
-                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null);
+                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null, null);
                         TB_Status.Text += $"\n Number of template nodes got: {tempInstList.Count}";
                     }
                     catch (Exception ex)
@@ -112,9 +112,9 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataABList, textLogg_g, null);
+                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
                             TB_Status.Text += $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ";
-                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null);
+                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null, null);
                             TB_Status.Text += $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done";
                             string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
                             TB_Status.Text += $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}";
@@ -123,7 +123,7 @@ namespace IgnitionHelper
                             TB_Status.Text += $"\n Saved file: {newName}";
                             foreach (var item in tagDataABList)
                             {
-                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.FolderName};isAdded:{item.IsAdded}");
+                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
                             }
                         }
                         catch (Exception ex)
@@ -158,11 +158,11 @@ namespace IgnitionHelper
         }
         public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
-            List<string> folderNames = tagDataList.Select(s => s.FolderName).Distinct().ToList();
+            List<string> folderNames = tagDataList.Select(s => s.VisuFolderName).Distinct().ToList();
 
             foreach (string folderName in folderNames)
             {
-                var folderCount = tagDataList.Count(tagData => tagData.FolderName == folderName && tagData.IsAdded);
+                var folderCount = tagDataList.Count(tagData => tagData.VisuFolderName == folderName && tagData.IsAdded);
                 textBlock.Text += $"\n Folder name: {folderName} count: {folderCount}";
             }
         }
