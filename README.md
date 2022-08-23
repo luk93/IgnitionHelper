@@ -11,3 +11,4 @@ Features:
   1.4. Click button "Select Exp Tags (.XLSX)" and chose file created in point (1.2)
   1.5. Click button "Generate XML" and chose file created in point (1.3)
   1.6. Import (option "Direct") generated (*_edit.xml) file to Studio 5000 (PLC Tags branch)
+2. Creates spreadsheet showing acquired in (1) data set covering PLC Tag used in Allan Bradley and HMI Tag used in Ignition
