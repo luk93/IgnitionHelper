@@ -59,7 +59,7 @@ namespace IgnitionHelper
             if (openFileDialog1.ShowDialog() == true)
             {
                 tagsFile_g = new FileInfo(openFileDialog1.FileName);
-                if (tagsFile_g.Exists && !IsFileLocked(tagsFile_g.FullName))
+                if (tagsFile_g.Exists && !Tools.IsFileLocked(tagsFile_g.FullName))
                 {
                     L_PLCTagsFilePath.Text = tagsFile_g.FullName;
                     TB_Status.Text += $"\n Selected: {tagsFile_g.FullName}";
@@ -102,7 +102,7 @@ namespace IgnitionHelper
             if (openFileDialog1.ShowDialog() == true)
             {
                 xmlFile_g = new FileInfo(openFileDialog1.FileName);
-                if (xmlFile_g.Exists && !IsFileLocked(xmlFile_g.FullName))
+                if (xmlFile_g.Exists && !Tools.IsFileLocked(xmlFile_g.FullName))
                 {
                     L_HMITagsFilePath.Text = xmlFile_g.FullName;
                     doc_g.Load(xmlFile_g.FullName);
@@ -154,18 +154,6 @@ namespace IgnitionHelper
                 }
             }
             textLogg_g.Close();
-        }
-        public static bool IsFileLocked(string filePath)
-        {
-            try
-            {
-                var stream = File.OpenRead(filePath);
-                return false;
-            }
-            catch (IOException)
-            {
-                return true;
-            }
         }
         public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
@@ -225,6 +213,7 @@ namespace IgnitionHelper
             if (Directory.Exists(expFolderPath))
             {
                 DirectoryInfo directory = new DirectoryInfo(expFolderPath);
+                expFolderPath = OverridePathWithDateTimeSubfolder(expFolderPath);
                 L_ExpFolderPath.Text = expFolderPath;
                 EB_ExpFolderSelected();
             }
@@ -239,6 +228,7 @@ namespace IgnitionHelper
                 {
                     expFolderPath = openFolderDialog.SelectedPath + @"\";
                     DirectoryInfo directory = new DirectoryInfo(expFolderPath);
+                    expFolderPath = OverridePathWithDateTimeSubfolder(expFolderPath);
                     L_ExpFolderPath.Text = expFolderPath;
                     EB_ExpFolderSelected();
                 }
@@ -259,6 +249,13 @@ namespace IgnitionHelper
             B_OpenExpFolder.IsEnabled = true;
             B_SelectTagsXLSX.IsEnabled = true;
             B_SelectDTFromAB.IsEnabled = true;
+        }
+        private string OverridePathWithDateTimeSubfolder(string expFolderPath)
+        {
+            string dateTime = Tools.GetDateTimeString();
+            DirectoryInfo directory2 = new DirectoryInfo(expFolderPath);
+            directory2.CreateSubdirectory(dateTime);
+            return expFolderPath + @"\" + dateTime;
         }
     }
 }
