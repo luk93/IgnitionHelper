@@ -48,7 +48,6 @@ namespace IgnitionHelper
                 }
                 catch (Exception e)
                 {
-                    streamWriter.WriteLine($"Error trying to create excel file: {e.Message}");
                     return null;
                 }
             }

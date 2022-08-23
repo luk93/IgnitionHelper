@@ -51,7 +51,7 @@ namespace IgnitionHelper
                 await CreateTemplate(childNode1, output, streamWriter, folderName, path);
             }
         }
-        public static async Task CheckXml(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        public static async Task setPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
             path = getPath(node, path);
             folderName = getFolderName(path);
@@ -69,7 +69,7 @@ namespace IgnitionHelper
                             if (xmlAttribute1.Value == "UdtInstance")
                             {
                                 //Search for Instance Of Data Block in Xml by the Name got from Excel
-                                TagDataPLC tagData = tagDataList.Find(item => item.Name.Contains(xmlAttribute2.Value));
+                                TagDataPLC tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value);
                                 if (tagData != null)
                                 {
                                     //Search for Instance Of Data Block Data Type in Xml by the Data Type got from Excel
@@ -114,7 +114,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CheckXml(childNode1, tagDataList, streamWriter, folderName, path);
+                await setPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
         public static async Task EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,7 @@ namespace IgnitionHelper
         List<TagDataPLC> tagDataABList;
         List<TempInstanceVisu> tempInstList;
         public static int PB_Progress;
+        public static string expFolderPath = @"C:\Users\plradlig\Desktop\Lucid\Ignition\ExportFiles\App_Exp_files";
         public MainWindow()
         {
             InitializeComponent();
@@ -38,6 +40,7 @@ namespace IgnitionHelper
             tagDataABList = new List<TagDataPLC>();
             tempInstList = new List<TempInstanceVisu>();
             doc_g = new XmlDocument();
+            CheckExportFolderPath();
         }
         private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
         {
@@ -58,12 +61,16 @@ namespace IgnitionHelper
                 tagsFile_g = new FileInfo(openFileDialog1.FileName);
                 if (tagsFile_g.Exists && !IsFileLocked(tagsFile_g.FullName))
                 {
+                    L_PLCTagsFilePath.Text = tagsFile_g.FullName;
                     TB_Status.Text += $"\n Selected: {tagsFile_g.FullName}";
-                    textLogg_g = new StreamWriter($"{tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.Length - 5)}_textLogg.txt");
+                    textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
                     try
                     {
+                        if (tagDataABList.Count >= 0)
+                            tagDataABList.Clear();
                         tagDataABList = await ExcelOperations.loadFromExcelFile(tagsFile_g);
                         TB_Status.Text += $"\n Acquired {tagDataABList.Count.ToString()} tags";
+                        B_GenerateXml.IsEnabled = true;
                     }
                     catch (Exception ex)
                     {
@@ -97,9 +104,12 @@ namespace IgnitionHelper
                 xmlFile_g = new FileInfo(openFileDialog1.FileName);
                 if (xmlFile_g.Exists && !IsFileLocked(xmlFile_g.FullName))
                 {
+                    L_HMITagsFilePath.Text = xmlFile_g.FullName;
                     doc_g.Load(xmlFile_g.FullName);
                     try
                     {
+                        if (tempInstList.Count >= 0)
+                            tempInstList.Clear();
                         await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null, null);
                         TB_Status.Text += $"\n Number of template nodes got: {tempInstList.Count}";
                     }
@@ -112,11 +122,11 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.CheckXml(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
+                            await XmlOperations.setPLCTagInHMIStatus(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
                             TB_Status.Text += $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ";
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null, null);
                             TB_Status.Text += $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done";
-                            string newName = xmlFile_g.FullName.Replace(".xml", "_edit.xml");
+                            string newName = expFolderPath + @"\"+ xmlFile_g.Name.Replace(".xml", "_edit.xml");
                             TB_Status.Text += $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}";
                             doc_g.Save($"{newName}");
                             GetFoldersInfo(tagDataABList, TB_Status);
@@ -125,6 +135,7 @@ namespace IgnitionHelper
                             {
                                 textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
                             }
+                            B_GenExcelTagData.IsEnabled = true;
                         }
                         catch (Exception ex)
                         {
@@ -168,7 +179,7 @@ namespace IgnitionHelper
         }
         private async void B_GenExcelTagData_Click(object sender, RoutedEventArgs e)
         {
-            String filePath = tagsFile_g.FullName.Substring(0, tagsFile_g.FullName.LastIndexOf(@"\")) + @"\TagDataExport.xlsx";
+            String filePath = expFolderPath + @"\TagDataExport.xlsx";
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
             {
@@ -181,15 +192,73 @@ namespace IgnitionHelper
             await ExcelOperations.SaveExcelFile(excelPackage);
             TB_Status.Text += $"\n Created file : {filePath}";
         }
+        private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var openFolderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+            {
+                openFolderDialog.Description = "Select export Directory:";
+            };
+            var result = openFolderDialog.ShowDialog();
+            if (result == true)
+            {
+                expFolderPath = openFolderDialog.SelectedPath + @"\";
+                DirectoryInfo directory = new DirectoryInfo(expFolderPath);
+                L_ExpFolderPath.Text = expFolderPath;
+                EB_ExpFolderSelected();
+            }
+        }
 
-        private void B_GetDTFromIgni_Click(object sender, RoutedEventArgs e)
+        private void B_OpenExpFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start("explorer.exe",@expFolderPath);
+            }
+            catch(Exception ex)
+            {
+                TB_Status.Text += ex.Message;
+                TB_Status.Text += ex.StackTrace;
+            }
+        }
+        private void CheckExportFolderPath()
+        {
+            if (Directory.Exists(expFolderPath))
+            {
+                DirectoryInfo directory = new DirectoryInfo(expFolderPath);
+                L_ExpFolderPath.Text = expFolderPath;
+                EB_ExpFolderSelected();
+            }
+            else
+            {
+                var openFolderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+                {
+                    openFolderDialog.Description = "Select export Directory:";
+                };
+                var result = openFolderDialog.ShowDialog();
+                if (result == true)
+                {
+                    expFolderPath = openFolderDialog.SelectedPath + @"\";
+                    DirectoryInfo directory = new DirectoryInfo(expFolderPath);
+                    L_ExpFolderPath.Text = expFolderPath;
+                    EB_ExpFolderSelected();
+                }
+            }
+        }
+
+        private void B_SelectDTFromAB_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void B_GetDTFromAB_Click(object sender, RoutedEventArgs e)
+        private void B_SelectDTFromHMI_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+        private void EB_ExpFolderSelected()
+        {
+            B_OpenExpFolder.IsEnabled = true;
+            B_SelectTagsXLSX.IsEnabled = true;
+            B_SelectDTFromAB.IsEnabled = true;
         }
     }
 }
