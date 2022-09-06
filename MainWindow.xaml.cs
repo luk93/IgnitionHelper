@@ -25,10 +25,10 @@ namespace IgnitionHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        FileInfo tagsFile_g;
-        FileInfo xmlFile_g;
+        FileInfo tagsFile_g = null!;
+        FileInfo xmlFile_g = null!;
         XmlDocument doc_g;
-        public static StreamWriter textLogg_g;
+        public static StreamWriter textLogg_g = null!;
         List<TagDataPLC> tagDataABList;
         List<TempInstanceVisu> tempInstList;
         public static int PB_Progress;
@@ -40,8 +40,9 @@ namespace IgnitionHelper
             tagDataABList = new List<TagDataPLC>();
             tempInstList = new List<TempInstanceVisu>();
             doc_g = new XmlDocument();
-            CheckExportFolderPath();
+            CheckExportFolderPath(expFolderPath, L_ExpFolderPath);
         }
+        #region UI_EventHandlers
         private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog1 = new()
@@ -62,20 +63,20 @@ namespace IgnitionHelper
                 if (tagsFile_g.Exists && !Tools.IsFileLocked(tagsFile_g.FullName))
                 {
                     L_PLCTagsFilePath.Text = tagsFile_g.FullName;
-                    TB_Status.Text += $"\n Selected: {tagsFile_g.FullName}";
+                    TextblockAddLine(TB_Status, $"\n Selected: {tagsFile_g.FullName}");
                     textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
                     try
                     {
                         if (tagDataABList.Count >= 0)
                             tagDataABList.Clear();
-                        tagDataABList = await ExcelOperations.loadFromExcelFile(tagsFile_g);
-                        TB_Status.Text += $"\n Acquired {tagDataABList.Count.ToString()} tags";
+                        tagDataABList = await ExcelOperations.LoadFromExcelFile(tagsFile_g);
+                        TextblockAddLine(TB_Status, $"\n Acquired {tagDataABList.Count.ToString()} tags");
                         B_GenerateXml.IsEnabled = true;
                     }
                     catch (Exception ex)
                     {
                         TB_Status.Text = ex.Message;
-                        TB_Status.Text += ex.StackTrace;
+                        TextblockAddLine(TB_Status, ex.StackTrace);
                     }
 
                 }
@@ -111,26 +112,26 @@ namespace IgnitionHelper
                         if (tempInstList.Count >= 0)
                             tempInstList.Clear();
                         await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null, null);
-                        TB_Status.Text += $"\n Number of template nodes got: {tempInstList.Count}";
+                        TextblockAddLine(TB_Status, $"\n Number of template nodes got: {tempInstList.Count}");
                     }
                     catch (Exception ex)
                     {
                         TB_Status.Text = $"\n {ex.Message}";
-                        TB_Status.Text += $"\n {ex.StackTrace}";
+                        TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
                     }
                     if (tempInstList.Count > 0)
                     {
                         try
                         {
                             await XmlOperations.setPLCTagInHMIStatus(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
-                            TB_Status.Text += $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ";
+                            TextblockAddLine(TB_Status, $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ");
                             await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null, null);
-                            TB_Status.Text += $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done";
-                            string newName = expFolderPath + @"\"+ xmlFile_g.Name.Replace(".xml", "_edit.xml");
-                            TB_Status.Text += $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}";
+                            TextblockAddLine(TB_Status, $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done");
+                            string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
+                            TextblockAddLine(TB_Status, $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}");
                             doc_g.Save($"{newName}");
                             GetFoldersInfo(tagDataABList, TB_Status);
-                            TB_Status.Text += $"\n Saved file: {newName}";
+                            TextblockAddLine(TB_Status, $"\n Saved file: {newName}");
                             foreach (var item in tagDataABList)
                             {
                                 textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
@@ -140,7 +141,7 @@ namespace IgnitionHelper
                         catch (Exception ex)
                         {
                             TB_Status.Text = $"\n {ex.Message}";
-                            TB_Status.Text += $"\n {ex.StackTrace}";
+                            TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
                         }
                     }
                     else
@@ -171,14 +172,14 @@ namespace IgnitionHelper
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
             {
-                TB_Status.Text += "Failed to create (.xlsx) file!";
+                TextblockAddLine(TB_Status, "Failed to create (.xlsx) file!");
                 return;
             }
             var ws = excelPackage.Workbook.Worksheets.Add("Tag Data List");
             var range = ws.Cells["A1"].LoadFromCollection(tagDataABList, true);
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
-            TB_Status.Text += $"\n Created file : {filePath}";
+            TextblockAddLine(TB_Status, $"\n Created file : {filePath}");
         }
         private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -195,26 +196,39 @@ namespace IgnitionHelper
                 EB_ExpFolderSelected();
             }
         }
-
         private void B_OpenExpFolder_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Process.Start("explorer.exe",@expFolderPath);
+                Process.Start("explorer.exe", @expFolderPath);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                TB_Status.Text += ex.Message;
-                TB_Status.Text += ex.StackTrace;
+                TextblockAddLine(TB_Status, ex.Message);
+                TextblockAddLine(TB_Status, ex.StackTrace);
             }
         }
-        private void CheckExportFolderPath()
+        private void B_SelectDTFromAB_Click(object sender, RoutedEventArgs e)
+        {
+        }
+        private void B_SelectDTFromHMI_Click(object sender, RoutedEventArgs e)
+        {
+        }
+        #endregion
+        #region UI Functions
+        public void EB_ExpFolderSelected()
+        {
+            B_OpenExpFolder.IsEnabled = true;
+            B_SelectTagsXLSX.IsEnabled = true;
+            B_SelectDTFromAB.IsEnabled = true;
+        }
+        public void CheckExportFolderPath(string expFolderPath, TextBlock tb)
         {
             if (Directory.Exists(expFolderPath))
             {
                 DirectoryInfo directory = new DirectoryInfo(expFolderPath);
-                expFolderPath = OverridePathWithDateTimeSubfolder(expFolderPath);
-                L_ExpFolderPath.Text = expFolderPath;
+                expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
+                tb.Text = expFolderPath;
                 EB_ExpFolderSelected();
             }
             else
@@ -228,34 +242,13 @@ namespace IgnitionHelper
                 {
                     expFolderPath = openFolderDialog.SelectedPath + @"\";
                     DirectoryInfo directory = new DirectoryInfo(expFolderPath);
-                    expFolderPath = OverridePathWithDateTimeSubfolder(expFolderPath);
-                    L_ExpFolderPath.Text = expFolderPath;
+                    expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
+                    tb.Text = expFolderPath;
                     EB_ExpFolderSelected();
                 }
             }
         }
-
-        private void B_SelectDTFromAB_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void B_SelectDTFromHMI_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void EB_ExpFolderSelected()
-        {
-            B_OpenExpFolder.IsEnabled = true;
-            B_SelectTagsXLSX.IsEnabled = true;
-            B_SelectDTFromAB.IsEnabled = true;
-        }
-        private string OverridePathWithDateTimeSubfolder(string expFolderPath)
-        {
-            string dateTime = Tools.GetDateTimeString();
-            DirectoryInfo directory2 = new DirectoryInfo(expFolderPath);
-            directory2.CreateSubdirectory(dateTime);
-            return expFolderPath + @"\" + dateTime;
-        }
+        public static void TextblockAddLine(TextBlock tb, string text) => tb.Inlines.InsertBefore(tb.Inlines.FirstInline, new Run(text));
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace IgnitionHelper
 {
@@ -46,6 +47,13 @@ namespace IgnitionHelper
             }
             else dateTime += DateTime.Now.TimeOfDay.Minutes;
             return dateTime;
+        }
+        public static string OverridePathWithDateTimeSubfolder(string expFolderPath)
+        {
+            string dateTime = Tools.GetDateTimeString();
+            DirectoryInfo directory2 = new DirectoryInfo(expFolderPath);
+            directory2.CreateSubdirectory(dateTime);
+            return expFolderPath + @"\" + dateTime;
         }
     }
 }
