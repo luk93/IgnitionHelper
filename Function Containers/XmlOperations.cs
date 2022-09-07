@@ -166,7 +166,7 @@ namespace IgnitionHelper
                 await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditUdtXml(XmlNode node, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        public static async Task EditUdtXml(XmlNode node, TagEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -189,6 +189,7 @@ namespace IgnitionHelper
                                     {
                                         if (valueToEditAtt.Value == valueToEdit)
                                         {
+                                            editData.GroupChange++;
                                             childNode2.InnerText = value;
                                             await streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                         }
@@ -216,6 +217,7 @@ namespace IgnitionHelper
                                                     {
                                                         if (valueToEditAtt.Value == valueToEdit)
                                                         {
+                                                            editData.TagChange++;
                                                             childNode4.InnerText = value;
                                                             await streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                                         }
@@ -232,7 +234,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtXml(childNode1, streamWriter, tagGroup, valueToEdit, value);
+                await EditUdtXml(childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
             }
         }
 
