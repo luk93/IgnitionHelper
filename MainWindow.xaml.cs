@@ -18,6 +18,7 @@ using System.Xml;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using static System.Net.WebRequestMethods;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace IgnitionHelper
 {
@@ -44,9 +45,8 @@ namespace IgnitionHelper
             CheckExportFolderPath(expFolderPath, L_ExpFolderPath);
         }
         #region UI_EventHandlers
-        private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
+        private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
-            //
             tagsFile_g = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
             if (tagsFile_g != null)
             {
@@ -68,7 +68,7 @@ namespace IgnitionHelper
                 }
             }
         }
-        private async void B_GenerateXml_Click(object sender, RoutedEventArgs e)
+        private async void B_GenerateXml_ClickAsync(object sender, RoutedEventArgs e)
         {
             xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
             if (xmlFile_g != null)
@@ -128,7 +128,7 @@ namespace IgnitionHelper
                 TextblockAddLine(textBlock, $"\n Folder name: {folderName} count: {folderCount}");
             }
         }
-        private async void B_GenExcelTagData_Click(object sender, RoutedEventArgs e)
+        private async void B_GenExcelTagData_ClickAsync(object sender, RoutedEventArgs e)
         {
             String filePath = expFolderPath + @"\TagDataExport.xlsx";
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
@@ -167,7 +167,7 @@ namespace IgnitionHelper
             catch (Exception ex)
             {
                 TextblockAddLine(TB_Status, $"\n {ex.Message}");
-                TextblockAddLine(TB_Status, ex.StackTrace!=null? $"\n {ex.StackTrace}" : "");
+                TextblockAddLine(TB_Status, ex.StackTrace != null ? $"\n {ex.StackTrace}" : "");
             }
         }
         private void B_SelectDTFromAB_Click(object sender, RoutedEventArgs e)
@@ -178,7 +178,41 @@ namespace IgnitionHelper
         }
         private void B_SelectFileToEdit_Click(object sender, RoutedEventArgs e)
         {
-
+            xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
+            if (xmlFile_g != null)
+            {
+                L_SelectedFileToEditPath.Text = xmlFile_g.FullName;
+                TextblockAddLine(TB_Status, $"\n Selected xml file to Edit : {xmlFile_g.FullName}");
+                doc_g.Load(xmlFile_g.FullName);
+                if (doc_g.DocumentElement != null)
+                {
+                    B_EditTagUdt.IsEnabled = true;
+                }
+            }
+        }
+        private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            string tagGroup = TB_TagGroup.Text;
+            string valueToEdit = TB_ValueToEdit.Text;
+            string value = TB_EditValue.Text;
+            if(string.IsNullOrEmpty(value)|| string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
+            {
+                TextblockAddLine(TB_Status, "\n Fill all labels!");
+                return;
+            }
+            try
+            {
+                await XmlOperations.EditUdtXml(doc_g.DocumentElement, tagGroup, valueToEdit, value);
+                TextblockAddLine(TB_Status, $"\n Done editing!");
+                string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
+                TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
+                doc_g.Save($"{newName}");
+            }
+            catch (Exception ex)
+            {
+                TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
+            }
         }
         #endregion
         #region UI Functions

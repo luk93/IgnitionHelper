@@ -140,7 +140,7 @@ namespace IgnitionHelper
                                     if (!tagData.IsAdded)
                                     {
                                         //tolerance in names extended
-                                        TempInstanceVisu tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name,tagData.DataTypePLC,StringComparison.OrdinalIgnoreCase) ||
+                                        TempInstanceVisu tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
                                                                                             StringExt.Contains(tagData.DataTypePLC, item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
                                         if (tempInst != null)
                                         {
@@ -166,6 +166,71 @@ namespace IgnitionHelper
                 await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
+        public static async Task EditUdtXml(XmlNode node, string tagGroup, string valueToEdit, string value)
+        {
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                if (childNode1.Name == "Tag")
+                {
+                    XmlAttribute tagType = childNode1.Attributes["type"];
+                    XmlAttribute tagName = childNode1.Attributes["name"];
+                    if (tagType != null && tagName != null)
+                    {
+                        //Find correct group of Tags in Each Tag (for example CB)
+                        if (tagType.Value == "Folder" && tagName.Value == tagGroup)
+                        {
+                            foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                            {
+                                //Change to valueToEdit to value for group of Tags
+                                if (childNode2.Name == "Property")
+                                {
+                                    XmlAttribute valueToEditAtt = childNode2.Attributes[valueToEdit];
+                                    if (valueToEditAtt != null)
+                                    {
+                                        childNode2.InnerText = value;
+                                    }
+                                }
+                                if (childNode2.Name == "Tags")
+                                {
+                                    //Edit All tags from this group 
+                                    foreach (XmlNode childNode3 in childNode2.ChildNodes)
+                                    {
+                                        if (childNode3.Name == "Tags")
+                                        {
+                                            //Edit All tags from this group 
+                                            foreach (XmlNode childNode4 in childNode3.ChildNodes)
+                                            {
+                                                if (childNode4.Name == "Tag")
+                                                {
+                                                    foreach (XmlNode childNode5 in childNode4.ChildNodes)
+                                                    {
+                                                        if (childNode5.Name == "Property")
+                                                        {
+                                                            XmlAttribute valueToEditAtt = childNode5.Attributes[valueToEdit];
+                                                            if (valueToEditAtt != null)
+                                                            {
+                                                                childNode5.InnerText = value;
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                await EditUdtXml(childNode1, tagGroup, valueToEdit, value);
+            }
+        }
+
         private static string getFolderName(string path)
         {
             string output = "";
