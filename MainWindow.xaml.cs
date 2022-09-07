@@ -250,5 +250,10 @@ namespace IgnitionHelper
         }
         public static void TextblockAddLine(TextBlock tb, string text) => tb.Inlines.InsertBefore(tb.Inlines.FirstInline, new Run(text));
         #endregion
+
+        private void B_SelectFileToEdit(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
