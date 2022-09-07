@@ -207,7 +207,7 @@ namespace IgnitionHelper
                     TagEditData editData = new();
                     textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
                     await XmlOperations.EditUdtXml(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
-                    TextblockAddLine(TB_Status, $"\n Done editing! Edited groups: {editData.GroupPropChange}, Edited tags: {editData.TagPropChanged}");
+                    TextblockAddLine(TB_Status, $"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
                     string newName = expFolderPath + @"\" + xmlFile_g.Name;
                     TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
                     doc_g.Save($"{newName}");

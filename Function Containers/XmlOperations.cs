@@ -252,7 +252,7 @@ namespace IgnitionHelper
                                 xmlAttribute.Value = valueToEdit;
                                 newNode.Attributes.SetNamedItem(xmlAttribute);
                                 newNode.InnerText = value;
-                                editData.TagPropAdded++;
+                                editData.GroupPropAdded++;
                                 childNode1.InsertAfter(newNode, childNode1.LastChild);
                                 await streamWriter.WriteLineAsync($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                             }
