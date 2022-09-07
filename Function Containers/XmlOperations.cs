@@ -166,7 +166,7 @@ namespace IgnitionHelper
                 await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditUdtXml(XmlNode node, string tagGroup, string valueToEdit, string value)
+        public static async Task EditUdtXml(XmlNode node, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -184,39 +184,44 @@ namespace IgnitionHelper
                                 //Change to valueToEdit to value for group of Tags
                                 if (childNode2.Name == "Property")
                                 {
-                                    XmlAttribute valueToEditAtt = childNode2.Attributes[valueToEdit];
+                                    XmlAttribute valueToEditAtt = childNode2.Attributes["name"];
                                     if (valueToEditAtt != null)
                                     {
-                                        childNode2.InnerText = value;
+                                        if (valueToEditAtt.Value == valueToEdit)
+                                        {
+                                            childNode2.InnerText = value;
+                                            await streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                        }
                                     }
                                 }
                                 if (childNode2.Name == "Tags")
                                 {
-                                    //Edit All tags from this group 
                                     foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                     {
-                                        if (childNode3.Name == "Tags")
+                                        if (childNode3.Name == "Tag")
                                         {
                                             //Edit All tags from this group 
+                                            string childTagNameValue = "";
+                                            var childTagName = childNode3.Attributes["name"];
+                                            if (childTagName != null)
+                                            {
+                                                childTagNameValue = childTagName.Value;
+                                            }
                                             foreach (XmlNode childNode4 in childNode3.ChildNodes)
                                             {
-                                                if (childNode4.Name == "Tag")
+                                                if (childNode4.Name == "Property")
                                                 {
-                                                    foreach (XmlNode childNode5 in childNode4.ChildNodes)
+                                                    XmlAttribute valueToEditAtt = childNode4.Attributes["name"];
+                                                    if (valueToEditAtt != null)
                                                     {
-                                                        if (childNode5.Name == "Property")
+                                                        if (valueToEditAtt.Value == valueToEdit)
                                                         {
-                                                            XmlAttribute valueToEditAtt = childNode5.Attributes[valueToEdit];
-                                                            if (valueToEditAtt != null)
-                                                            {
-                                                                childNode5.InnerText = value;
-                                                            }
+                                                            childNode4.InnerText = value;
+                                                            await streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                                         }
                                                     }
-
                                                 }
                                             }
-
                                         }
                                     }
                                 }
@@ -227,7 +232,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtXml(childNode1, tagGroup, valueToEdit, value);
+                await EditUdtXml(childNode1, streamWriter, tagGroup, valueToEdit, value);
             }
         }
 

@@ -42,7 +42,8 @@ namespace IgnitionHelper
             tagDataABList = new List<TagDataPLC>();
             tempInstList = new List<TempInstanceVisu>();
             doc_g = new XmlDocument();
-            CheckExportFolderPath(expFolderPath, L_ExpFolderPath);
+            expFolderPath = CheckExportFolderPath(expFolderPath, TB_ExpFolderPath);
+            textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
         }
         #region UI_EventHandlers
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
@@ -52,7 +53,6 @@ namespace IgnitionHelper
             {
                 L_PLCTagsFilePath.Text = tagsFile_g.FullName;
                 TextblockAddLine(TB_Status, $"\n Selected: {tagsFile_g.FullName}");
-                textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
                 try
                 {
                     if (tagDataABList.Count >= 0)
@@ -154,7 +154,7 @@ namespace IgnitionHelper
             {
                 expFolderPath = openFolderDialog.SelectedPath + @"\";
                 DirectoryInfo directory = new DirectoryInfo(expFolderPath);
-                L_ExpFolderPath.Text = expFolderPath;
+                TB_ExpFolderPath.Text = expFolderPath;
                 EB_ExpFolderSelected();
             }
         }
@@ -195,24 +195,35 @@ namespace IgnitionHelper
             string tagGroup = TB_TagGroup.Text;
             string valueToEdit = TB_ValueToEdit.Text;
             string value = TB_EditValue.Text;
-            if(string.IsNullOrEmpty(value)|| string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
             {
                 TextblockAddLine(TB_Status, "\n Fill all labels!");
                 return;
             }
-            try
+            if (doc_g.DocumentElement != null)
             {
-                await XmlOperations.EditUdtXml(doc_g.DocumentElement, tagGroup, valueToEdit, value);
-                TextblockAddLine(TB_Status, $"\n Done editing!");
-                string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
-                TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
-                doc_g.Save($"{newName}");
+                try
+                {
+                    textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
+                    await XmlOperations.EditUdtXml(doc_g.DocumentElement, textLogg_g, tagGroup, valueToEdit, value);
+                    TextblockAddLine(TB_Status, $"\n Done editing!");
+                    string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
+                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
+                    doc_g.Save($"{newName}");
+                }
+                catch (Exception ex)
+                {
+                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
+                }
             }
-            catch (Exception ex)
-            {
-                TextblockAddLine(TB_Status, $"\n {ex.Message}");
-                TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
-            }
+            else
+                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
+        }
+        private void B_TextloggClose_Click(object sender, RoutedEventArgs e)
+        {
+            textLogg_g.WriteLine("Manually closed.");
+            textLogg_g.Close();
         }
         #endregion
         #region UI Functions
@@ -222,12 +233,14 @@ namespace IgnitionHelper
             B_SelectTagsXLSX.IsEnabled = true;
             B_SelectDTFromAB.IsEnabled = true;
         }
-        public void CheckExportFolderPath(string expFolderPath, TextBlock tb)
+        public string CheckExportFolderPath(string expFolderPath, TextBlock tb)
         {
+            string toReturn = expFolderPath;
             if (Directory.Exists(expFolderPath))
             {
                 expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
                 tb.Text = expFolderPath;
+                toReturn = expFolderPath;
                 EB_ExpFolderSelected();
             }
             else
@@ -241,10 +254,12 @@ namespace IgnitionHelper
                 {
                     expFolderPath = openFolderDialog.SelectedPath + @"\";
                     expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
+                    toReturn = expFolderPath;
                     tb.Text = expFolderPath;
                     EB_ExpFolderSelected();
                 }
             }
+            return toReturn;
         }
         public static void TextblockAddLine(TextBlock tb, string text)
         {
