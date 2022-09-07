@@ -166,7 +166,7 @@ namespace IgnitionHelper
                 await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditUdtXml(XmlNode node, TagEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        public static async Task EditUdtXml(XmlDocument doc, XmlNode node, TagEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -179,6 +179,7 @@ namespace IgnitionHelper
                         //Find correct group of Tags in Each Tag (for example CB)
                         if (tagType.Value == "Folder" && tagName.Value == tagGroup)
                         {
+                            bool groupPropFound = false;
                             foreach (XmlNode childNode2 in childNode1.ChildNodes)
                             {
                                 //Change to valueToEdit to value for group of Tags
@@ -189,7 +190,8 @@ namespace IgnitionHelper
                                     {
                                         if (valueToEditAtt.Value == valueToEdit)
                                         {
-                                            editData.GroupChange++;
+                                            groupPropFound = true;
+                                            editData.GroupPropChange++;
                                             childNode2.InnerText = value;
                                             await streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                         }
@@ -208,6 +210,7 @@ namespace IgnitionHelper
                                             {
                                                 childTagNameValue = childTagName.Value;
                                             }
+                                            bool tagPropFound = false;
                                             foreach (XmlNode childNode4 in childNode3.ChildNodes)
                                             {
                                                 if (childNode4.Name == "Property")
@@ -217,16 +220,41 @@ namespace IgnitionHelper
                                                     {
                                                         if (valueToEditAtt.Value == valueToEdit)
                                                         {
-                                                            editData.TagChange++;
+                                                            tagPropFound = true;
+                                                            editData.TagPropChanged++;
                                                             childNode4.InnerText = value;
                                                             await streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                                         }
                                                     }
                                                 }
                                             }
+                                            if(!tagPropFound)
+                                            {
+                                                //Create new node with attribute
+                                                XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
+                                                XmlAttribute xmlAttribute = doc.CreateAttribute("name");
+                                                xmlAttribute.Value = valueToEdit;
+                                                newNode.Attributes.SetNamedItem(xmlAttribute);
+                                                newNode.InnerText = value;
+                                                editData.TagPropAdded++;
+                                                childNode3.InsertAfter(newNode, childNode3.LastChild);
+                                                await streamWriter.WriteLineAsync($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                            }
                                         }
                                     }
                                 }
+                            }
+                            if(!groupPropFound)
+                            {
+                                //Create new node with attribute
+                                XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
+                                XmlAttribute xmlAttribute = doc.CreateAttribute("name");
+                                xmlAttribute.Value = valueToEdit;
+                                newNode.Attributes.SetNamedItem(xmlAttribute);
+                                newNode.InnerText = value;
+                                editData.TagPropAdded++;
+                                childNode1.InsertAfter(newNode, childNode1.LastChild);
+                                await streamWriter.WriteLineAsync($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                             }
                         }
                     }
@@ -234,7 +262,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtXml(childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
+                await EditUdtXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
             }
         }
 

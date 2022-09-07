@@ -8,12 +8,16 @@ namespace IgnitionHelper
 {
     public class TagEditData
     {
-        public int GroupChange { get; set; }
-        public int TagChange { get; set; }
+        public int GroupPropChange { get; set; }
+        public int GroupPropAdded { get; set; }
+        public int TagPropChanged { get; set; }
+        public int TagPropAdded { get; set; }
         public TagEditData()
         {
-            GroupChange = 0;
-            TagChange = 0;
+            GroupPropChange = 0;
+            TagPropChanged = 0;
+            GroupPropAdded = 0;
+            TagPropAdded = 0;
         }
     }
 }
