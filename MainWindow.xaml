@@ -138,7 +138,7 @@
                             <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
-                    <Button x:Name ="B_SelectFileToEdit" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" Width="140" Height="30" Grid.ColumnSpan="4" Click="B_SelectFileToEdit" IsEnabled="False">
+                    <Button x:Name ="B_SelectFileToEdit" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" Width="140" Height="30" Grid.ColumnSpan="4" Click="B_SelectFileToEdit_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FF898C8A"/>

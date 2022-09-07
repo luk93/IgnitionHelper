@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using Microsoft.Win32;
 using OfficeOpenXml;
+using static System.Net.WebRequestMethods;
 
 namespace IgnitionHelper
 {
@@ -45,68 +46,37 @@ namespace IgnitionHelper
         #region UI_EventHandlers
         private async void B_SelectTagsXLSX_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new()
+            //
+            tagsFile_g = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
+            if (tagsFile_g != null)
             {
-                InitialDirectory = @"c:\Users\localadm\Desktop",
-                Title = "Select Exported from Studion5000 Tags Table (.xlsx)",
-                CheckFileExists = true,
-                CheckPathExists = true,
-                DefaultExt = "xlsx",
-                Filter = "Excel file (*.xlsx)|*.xlsx",
-                RestoreDirectory = true,
-                ReadOnlyChecked = true,
-                ShowReadOnly = true,
-            };
-            if (openFileDialog1.ShowDialog() == true)
-            {
-                tagsFile_g = new FileInfo(openFileDialog1.FileName);
-                if (tagsFile_g.Exists && !Tools.IsFileLocked(tagsFile_g.FullName))
+                L_PLCTagsFilePath.Text = tagsFile_g.FullName;
+                TextblockAddLine(TB_Status, $"\n Selected: {tagsFile_g.FullName}");
+                textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
+                try
                 {
-                    L_PLCTagsFilePath.Text = tagsFile_g.FullName;
-                    TextblockAddLine(TB_Status, $"\n Selected: {tagsFile_g.FullName}");
-                    textLogg_g = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
-                    try
-                    {
-                        if (tagDataABList.Count >= 0)
-                            tagDataABList.Clear();
-                        tagDataABList = await ExcelOperations.LoadFromExcelFile(tagsFile_g);
-                        TextblockAddLine(TB_Status, $"\n Acquired {tagDataABList.Count.ToString()} tags");
-                        B_GenerateXml.IsEnabled = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        TB_Status.Text = ex.Message;
-                        TextblockAddLine(TB_Status, ex.StackTrace);
-                    }
-
+                    if (tagDataABList.Count >= 0)
+                        tagDataABList.Clear();
+                    tagDataABList = await ExcelOperations.LoadFromExcelFile(tagsFile_g);
+                    TextblockAddLine(TB_Status, $"\n Acquired {tagDataABList.Count} tags");
+                    B_GenerateXml.IsEnabled = true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    TB_Status.Text = "File not exist or in use!";
+                    TextblockAddLine(TB_Status, $"\n{ex.Message}");
+                    TextblockAddLine(TB_Status, $"\n{ex.StackTrace}");
                 }
             }
         }
         private async void B_GenerateXml_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new()
+            xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
+            if (xmlFile_g != null)
             {
-                InitialDirectory = @"c:\Users\localadm\Desktop",
-                Title = "Select file exported from Ignition (.xml)",
-                CheckFileExists = true,
-                CheckPathExists = true,
-                DefaultExt = "xml",
-                Filter = "Xml file (*.xml)|*.xml",
-                RestoreDirectory = true,
-                ReadOnlyChecked = true,
-                ShowReadOnly = true,
-            };
-            if (openFileDialog1.ShowDialog() == true)
-            {
-                xmlFile_g = new FileInfo(openFileDialog1.FileName);
-                if (xmlFile_g.Exists && !Tools.IsFileLocked(xmlFile_g.FullName))
+                L_HMITagsFilePath.Text = xmlFile_g.FullName;
+                doc_g.Load(xmlFile_g.FullName);
+                if (doc_g.DocumentElement != null)
                 {
-                    L_HMITagsFilePath.Text = xmlFile_g.FullName;
-                    doc_g.Load(xmlFile_g.FullName);
                     try
                     {
                         if (tempInstList.Count >= 0)
@@ -116,7 +86,7 @@ namespace IgnitionHelper
                     }
                     catch (Exception ex)
                     {
-                        TB_Status.Text = $"\n {ex.Message}";
+                        TextblockAddLine(TB_Status, $"\n {ex.Message}");
                         TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
                     }
                     if (tempInstList.Count > 0)
@@ -140,21 +110,13 @@ namespace IgnitionHelper
                         }
                         catch (Exception ex)
                         {
-                            TB_Status.Text = $"\n {ex.Message}";
+                            TextblockAddLine(TB_Status, $"\n {ex.Message}");
                             TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
                         }
                     }
-                    else
-                    {
-                        TB_Status.Text = "\n No templates found in XML";
-                    }
-                }
-                else
-                {
-                    TB_Status.Text = "\n File not exist or in use!";
                 }
             }
-            textLogg_g.Close();
+
         }
         public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
@@ -163,7 +125,7 @@ namespace IgnitionHelper
             foreach (string folderName in folderNames)
             {
                 var folderCount = tagDataList.Count(tagData => tagData.VisuFolderName == folderName && tagData.IsAdded);
-                textBlock.Text += $"\n Folder name: {folderName} count: {folderCount}";
+                TextblockAddLine(textBlock, $"\n Folder name: {folderName} count: {folderCount}");
             }
         }
         private async void B_GenExcelTagData_Click(object sender, RoutedEventArgs e)
@@ -172,7 +134,7 @@ namespace IgnitionHelper
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
             {
-                TextblockAddLine(TB_Status, "Failed to create (.xlsx) file!");
+                TextblockAddLine(TB_Status, "\n Failed to create (.xlsx) file!");
                 return;
             }
             var ws = excelPackage.Workbook.Worksheets.Add("Tag Data List");
@@ -204,8 +166,8 @@ namespace IgnitionHelper
             }
             catch (Exception ex)
             {
-                TextblockAddLine(TB_Status, ex.Message);
-                TextblockAddLine(TB_Status, ex.StackTrace);
+                TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                TextblockAddLine(TB_Status, ex.StackTrace!=null? $"\n {ex.StackTrace}" : "");
             }
         }
         private void B_SelectDTFromAB_Click(object sender, RoutedEventArgs e)
@@ -213,6 +175,10 @@ namespace IgnitionHelper
         }
         private void B_SelectDTFromHMI_Click(object sender, RoutedEventArgs e)
         {
+        }
+        private void B_SelectFileToEdit_Click(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion
         #region UI Functions
@@ -226,7 +192,6 @@ namespace IgnitionHelper
         {
             if (Directory.Exists(expFolderPath))
             {
-                DirectoryInfo directory = new DirectoryInfo(expFolderPath);
                 expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
                 tb.Text = expFolderPath;
                 EB_ExpFolderSelected();
@@ -241,19 +206,77 @@ namespace IgnitionHelper
                 if (result == true)
                 {
                     expFolderPath = openFolderDialog.SelectedPath + @"\";
-                    DirectoryInfo directory = new DirectoryInfo(expFolderPath);
                     expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
                     tb.Text = expFolderPath;
                     EB_ExpFolderSelected();
                 }
             }
         }
-        public static void TextblockAddLine(TextBlock tb, string text) => tb.Inlines.InsertBefore(tb.Inlines.FirstInline, new Run(text));
-        #endregion
-
-        private void B_SelectFileToEdit(object sender, RoutedEventArgs e)
+        public static void TextblockAddLine(TextBlock tb, string text)
         {
-
+            if (!string.IsNullOrEmpty(text))
+                tb.Inlines.InsertBefore(tb.Inlines.FirstInline, new Run(text));
         }
+        public FileInfo SelectXmlFileAndTryToUse(string title)
+        {
+            OpenFileDialog openFileDialog1 = new()
+            {
+                InitialDirectory = @"c:\Users\localadm\Desktop",
+                Title = title,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = "xml",
+                Filter = "Xml file (*.xml)|*.xml",
+                RestoreDirectory = true,
+                ReadOnlyChecked = true,
+                ShowReadOnly = true,
+            };
+            if (openFileDialog1.ShowDialog() == true)
+            {
+                FileInfo xmlFile = new FileInfo(openFileDialog1.FileName);
+                if (xmlFile.Exists && !Tools.IsFileLocked(xmlFile.FullName))
+                {
+                    return xmlFile;
+                }
+                TextblockAddLine(TB_Status, "\n File not exist or in use!");
+                return null;
+            }
+            else
+            {
+                TextblockAddLine(TB_Status, "\n File not selected!");
+                return null;
+            }
+        }
+        public FileInfo SelectXlsxFileAndTryToUse(string title)
+        {
+            OpenFileDialog openFileDialog1 = new()
+            {
+                InitialDirectory = @"c:\Users\localadm\Desktop",
+                Title = title,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = "xlsx",
+                Filter = "Excel file (*.xlsx)|*.xlsx",
+                RestoreDirectory = true,
+                ReadOnlyChecked = true,
+                ShowReadOnly = true,
+            };
+            if (openFileDialog1.ShowDialog() == true)
+            {
+                FileInfo xmlFile = new FileInfo(openFileDialog1.FileName);
+                if (xmlFile.Exists && !Tools.IsFileLocked(xmlFile.FullName))
+                {
+                    return xmlFile;
+                }
+                TextblockAddLine(TB_Status, "\n File not exist or in use!");
+                return null;
+            }
+            else
+            {
+                TextblockAddLine(TB_Status, "\n File not selected!");
+                return null;
+            }
+        }
+        #endregion
     }
 }
