@@ -18,7 +18,7 @@ Features:
 3. Allows to change/add exported from Ignition xml file containing tags/udts. This feature allows to change typed property to typed value in specified by user group (folder) of tags.
   Manual to use feature:
   3.1. Export All PLC tags/udts from Ignition Designer (.xml)
-  3.2. Click button "Select File to Edit (.xml)" and chose file created in point (1.2)
+  3.2. Click button "Select File to Edit (.xml)" and choose file created in point (1.2)
   3.3. Fill 3 labels with correct data:
     -Tag Group (folder containing group of tags, for example SB - Status bits)
     -Value To Edit (property to change, for example tagGroup)
