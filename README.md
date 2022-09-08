@@ -12,7 +12,9 @@ Features:
   1.5. Click button "Generate XML" and chose file created in point (1.3)
   1.6. Import (option "Direct") generated (*_edit.xml) file to Studio 5000 (PLC Tags branch)
 2. Creates spreadsheet showing acquired in (1) data set covering PLC Tag used in Allan Bradley and HMI Tag used in Ignition
+
 ![](screenshots/screenshot1.png)
+
 3. Allows to change/add exported from Ignition xml file containing tags/udts. This feature allows to change typed property to typed value in specified by user group (folder) of tags.
   Manual to use feature:
   3.1. Export All PLC tags/udts from Ignition Designer (.xml)
@@ -22,4 +24,5 @@ Features:
     -Value To Edit (property to change, for example tagGroup)
     -Edit Value (expected value of property to change, for example tagGroup_SB)
   3.4. Click button "Edit" to edit selected file with typed in labels data, file will be saved in shown above destination (export folder)
+  
  ![](screenshots/screenshot2.png)   
