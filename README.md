@@ -2,7 +2,7 @@
 An app that helps Ignition Visualization Designer with some of the tasks.
 
 Features:
-1. Duplicates Instances od Data Types (Exported from Ignition (.xml)) according to Exported Tags (from Studio5000, (.xlsx))
+1. Duplicates Instances of Data Types (Exported from Ignition (.xml)) according to Exported Tags (from Studio5000, (.xlsx))
   Note: Data Type name of PLC Data Block needs to consist name of Data Type in Ignition Designer.
   Manual to use feature:
   1.1. Export All PLC tags from Studio 5000 (.csv)
@@ -21,4 +21,5 @@ Features:
     -Tag Group (folder containing group of tags, for example SB - Status bits)
     -Value To Edit (property to change, for example tagGroup)
     -Edit Value (expected value of property to change, for example tagGroup_SB)
+  3.4. Click button "Edit" to edit selected file with typed in labels data, file will be saved in shown above destination (export folder)
  ![](screenshots/screenshot2.png)   
