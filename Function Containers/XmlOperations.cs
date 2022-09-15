@@ -177,7 +177,7 @@ namespace IgnitionHelper
                     if (tagType != null && tagName != null)
                     {
                         //Find correct group of Tags in Each Tag (for example CB)
-                        if (tagType.Value == "Folder" && tagName.Value == tagGroup)
+                        if ((tagType.Value == "Folder" || tagType.Value == "AtomicTag") && tagName.Value == tagGroup)
                         {
                             bool groupPropFound = false;
                             foreach (XmlNode childNode2 in childNode1.ChildNodes)
