@@ -70,6 +70,7 @@ namespace IgnitionHelper
         }
         private async void B_GenerateXml_ClickAsync(object sender, RoutedEventArgs e)
         {
+            this.IsEnabled = false;
             xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
             if (xmlFile_g != null)
             {
@@ -116,7 +117,7 @@ namespace IgnitionHelper
                     }
                 }
             }
-
+            this.IsEnabled = true;
         }
         public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
@@ -130,6 +131,7 @@ namespace IgnitionHelper
         }
         private async void B_GenExcelTagData_ClickAsync(object sender, RoutedEventArgs e)
         {
+            this.IsEnabled = false;
             String filePath = expFolderPath + @"\TagDataExport.xlsx";
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
@@ -142,6 +144,7 @@ namespace IgnitionHelper
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
             TextblockAddLine(TB_Status, $"\n Created file : {filePath}");
+            this.IsEnabled = true;
         }
         private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -192,6 +195,7 @@ namespace IgnitionHelper
         }
         private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
+            this.IsEnabled = false;
             string tagGroup = TB_TagGroup.Text;
             string valueToEdit = TB_ValueToEdit.Text;
             string value = TB_EditValue.Text;
@@ -220,6 +224,7 @@ namespace IgnitionHelper
             }
             else
                 TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
+            this.IsEnabled = true;
         }
         private void B_TextloggClose_Click(object sender, RoutedEventArgs e)
         {
