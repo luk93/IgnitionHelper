@@ -182,6 +182,14 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
+                    <Button x:Name ="B_EditAlarmUdt" Grid.Column="3" Grid.Row="3" Content="Edit Alarms" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditAlarmUdt_ClickAsync" IsEnabled="False">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
                 </Grid>
             </TabItem>
         </TabControl>

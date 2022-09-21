@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace IgnitionHelper
 {
@@ -166,7 +168,7 @@ namespace IgnitionHelper
                 await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditUdtXml(XmlDocument doc, XmlNode node, TagEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        public static async Task EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -228,7 +230,7 @@ namespace IgnitionHelper
                                                     }
                                                 }
                                             }
-                                            if(!tagPropFound)
+                                            if (!tagPropFound)
                                             {
                                                 //Create new node with attribute
                                                 XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
@@ -244,7 +246,7 @@ namespace IgnitionHelper
                                     }
                                 }
                             }
-                            if(!groupPropFound)
+                            if (!groupPropFound)
                             {
                                 //Create new node with attribute
                                 XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
@@ -262,7 +264,85 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
+                await EditUdtPropertiesXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
+            }
+        }
+        public static async Task EditUdtAlarmsXml(XmlDocument doc, XmlNode node, AlarmEditData editData)
+        {
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                if (childNode1.Name == "CompoundProperty")
+                {
+                    XmlAttribute tagName = childNode1.Attributes["name"];
+                    if (tagName != null)
+                    {
+                        //Find Alarm
+                        if (tagName.Value == "alarms")
+                        {
+                            foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                            {
+                                //Operate on PropertySet Node
+                                if (childNode2.Name == "PropertySet")
+                                {
+                                    //Look for "displayPath
+                                    bool labelPathFound = false;
+                                    foreach (XmlNode childNode3 in childNode2.ChildNodes)
+                                    {
+                                        tagName = null;
+                                        tagName = childNode3.Attributes["name"];
+                                        if (tagName != null)
+                                        {
+                                            if (tagName.Value == "label")
+                                            {
+                                                labelPathFound = true;
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                    //If no displayPathFound do needed operations
+                                    if (!labelPathFound)
+                                    {
+                                        foreach (XmlNode childNode3 in childNode2.ChildNodes)
+                                        {
+                                            tagName = null;
+                                            tagName = childNode3.Attributes["name"];
+                                            if (tagName != null)
+                                            {
+                                                if (tagName.Value == "displayPath")
+                                                {
+                                                    //Copy "displayPath" node
+                                                    XmlNode newNode = childNode3.CloneNode(true);
+                                                    //Edit "displayPath node
+                                                    string cutName = "{TagName}";
+                                                    string textToCut = childNode3.InnerText;
+                                                    int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
+                                                    childNode3.InnerText = textToCut.Substring(0, cutPosition);
+                                                    //Edit new Node "label"
+                                                    newNode.Attributes["name"].Value = "label";
+                                                    newNode.InnerText = textToCut.Substring(cutPosition, textToCut.Length - cutPosition);
+                                                    //Insert new node
+                                                    childNode2.InsertAfter(newNode, childNode2.LastChild);
+                                                    editData.AlarmChanged++;
+                                                    break;
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        editData.AlarmPassed++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                await EditUdtAlarmsXml(doc, childNode1, editData);
             }
         }
 

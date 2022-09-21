@@ -190,6 +190,7 @@ namespace IgnitionHelper
                 if (doc_g.DocumentElement != null)
                 {
                     B_EditTagUdt.IsEnabled = true;
+                    B_EditAlarmUdt.IsEnabled = true;
                 }
             }
         }
@@ -208,9 +209,9 @@ namespace IgnitionHelper
             {
                 try
                 {
-                    TagEditData editData = new();
+                    TagPropertyEditData editData = new();
                     textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
-                    await XmlOperations.EditUdtXml(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
+                    await XmlOperations.EditUdtPropertiesXml(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
                     TextblockAddLine(TB_Status, $"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
                     string newName = expFolderPath + @"\" + xmlFile_g.Name;
                     TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
@@ -230,6 +231,30 @@ namespace IgnitionHelper
         {
             textLogg_g.WriteLine("Manually closed.");
             textLogg_g.Close();
+        }
+        private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
+            if (doc_g.DocumentElement != null)
+            {
+                try
+                {
+                    AlarmEditData editData = new();
+                    await XmlOperations.EditUdtAlarmsXml(doc_g, doc_g.DocumentElement, editData);
+                    TextblockAddLine(TB_Status, $"\n Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
+                    string newName = expFolderPath + @"\" + xmlFile_g.Name;
+                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
+                    doc_g.Save($"{newName}");
+                }
+                catch (Exception ex)
+                {
+                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
+                }
+            }
+            else
+                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
+            this.IsEnabled = true;
         }
         #endregion
         #region UI Functions
