@@ -10,11 +10,11 @@ namespace IgnitionHelper
 {
     public static class ExcelOperations
     {
-        public static async Task<List<TagDataPLC>> LoadFromExcelFile(FileInfo file)
+        private static List<TagDataPLC> LoadFromExcelFile(FileInfo file)
         {
             List<TagDataPLC> output = new List<TagDataPLC>();
             var package = new ExcelPackage(file);
-            await package.LoadAsync(file);
+            package.LoadAsync(file);
             var ws = package.Workbook.Worksheets[0];
             int row = 1;
             int col = 1;
@@ -39,6 +39,11 @@ namespace IgnitionHelper
                 }
             }
             return output;
+        }
+        public static async Task<List<TagDataPLC>> LoadFromExcelFileAsync(FileInfo file)
+        {
+            var output = new List<TagDataPLC>();
+            return output = await Task.Run(() => LoadFromExcelFileAsync(file));
         }
         public static ExcelPackage CreateExcelFile(string path, StreamWriter streamWriter)
         {

@@ -12,7 +12,7 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        public static async Task CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
+        private static void CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
         {
             if (output == null)
             {
@@ -50,10 +50,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await CreateTemplate(childNode1, output, streamWriter, folderName, path);
+                CreateTemplate(childNode1, output, streamWriter, folderName, path);
             }
         }
-        public static async Task setPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        private static void setPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
             path = getPath(node, path);
             folderName = getFolderName(path);
@@ -116,10 +116,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await setPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
+                setPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
+        private static void EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
         {
             path = getPath(node, path);
             folderName = getFolderName(path);
@@ -165,10 +165,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
+                EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        public static async Task EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -195,7 +195,7 @@ namespace IgnitionHelper
                                             groupPropFound = true;
                                             editData.GroupPropChange++;
                                             childNode2.InnerText = value;
-                                            await streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                            streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                         }
                                     }
                                 }
@@ -225,7 +225,7 @@ namespace IgnitionHelper
                                                             tagPropFound = true;
                                                             editData.TagPropChanged++;
                                                             childNode4.InnerText = value;
-                                                            await streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                            streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                                         }
                                                     }
                                                 }
@@ -240,7 +240,7 @@ namespace IgnitionHelper
                                                 newNode.InnerText = value;
                                                 editData.TagPropAdded++;
                                                 childNode3.InsertAfter(newNode, childNode3.LastChild);
-                                                await streamWriter.WriteLineAsync($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                streamWriter.WriteLineAsync($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                             }
                                         }
                                     }
@@ -256,7 +256,7 @@ namespace IgnitionHelper
                                 newNode.InnerText = value;
                                 editData.GroupPropAdded++;
                                 childNode1.InsertAfter(newNode, childNode1.LastChild);
-                                await streamWriter.WriteLineAsync($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                streamWriter.WriteLineAsync($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                             }
                         }
                     }
@@ -264,10 +264,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtPropertiesXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
+                EditUdtPropertiesXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
             }
         }
-        public static async Task EditUdtAlarmsXml(XmlDocument doc, XmlNode node, AlarmEditData editData)
+        private static void EditUdtAlarmsXml(XmlDocument doc, XmlNode node, AlarmEditData editData)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -342,8 +342,29 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                await EditUdtAlarmsXml(doc, childNode1, editData);
+                EditUdtAlarmsXml(doc, childNode1, editData);
             }
+        }
+
+        public static Task CreateTemplateAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
+        {
+            return Task.Run(() => CreateTemplate(node, output,streamWriter,folderName, path));
+        }
+        public static Task setPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        {
+            return Task.Run(() => setPLCTagInHMIStatus( node, tagDataList,  streamWriter,  folderName,  path));
+        }
+        public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
+        {
+            return Task.Run(() => EditXml( node, tagDataList, tempInstList, streamWriter, folderName, path));
+        }
+        public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        {
+            return Task.Run(() => EditUdtPropertiesXml(doc, node, editData, streamWriter, tagGroup, valueToEdit, value));
+        }
+        public static Task EditUdtAlarmsXmlAsync(XmlDocument doc, XmlNode node, AlarmEditData editData)
+        {
+            return Task.Run(() => EditUdtAlarmsXml(doc, node, editData));
         }
 
         private static string getFolderName(string path)

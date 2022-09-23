@@ -48,6 +48,7 @@ namespace IgnitionHelper
         #region UI_EventHandlers
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
+            B_SelectDTFromAB.IsEnabled = false;
             tagsFile_g = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
             if (tagsFile_g != null)
             {
@@ -67,10 +68,12 @@ namespace IgnitionHelper
                     TextblockAddLine(TB_Status, $"\n{ex.StackTrace}");
                 }
             }
+            B_SelectDTFromAB.IsEnabled = true;
+
         }
         private async void B_GenerateXml_ClickAsync(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            B_GenerateXml.IsEnabled = false;
             xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
             if (xmlFile_g != null)
             {
@@ -82,7 +85,7 @@ namespace IgnitionHelper
                     {
                         if (tempInstList.Count >= 0)
                             tempInstList.Clear();
-                        await XmlOperations.CreateTemplate(doc_g.DocumentElement, tempInstList, textLogg_g, null, null);
+                        await XmlOperations.CreateTemplateAsync(doc_g.DocumentElement, tempInstList, textLogg_g, null, null);
                         TextblockAddLine(TB_Status, $"\n Number of template nodes got: {tempInstList.Count}");
                     }
                     catch (Exception ex)
@@ -94,9 +97,9 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.setPLCTagInHMIStatus(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
+                            await XmlOperations.setPLCTagInHMIStatusAsync(doc_g.DocumentElement, tagDataABList, textLogg_g, null, null);
                             TextblockAddLine(TB_Status, $"\n Done checking! There was aleady {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances ");
-                            await XmlOperations.EditXml(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null, null);
+                            await XmlOperations.EditXmlAsync(doc_g.DocumentElement, tagDataABList, tempInstList, textLogg_g, null, null);
                             TextblockAddLine(TB_Status, $"\n Done editing! {tagDataABList.Count(item => item.IsAdded)}/{tagDataABList.Count} instances done");
                             string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
                             TextblockAddLine(TB_Status, $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}");
@@ -117,7 +120,7 @@ namespace IgnitionHelper
                     }
                 }
             }
-            this.IsEnabled = true;
+            B_GenerateXml.IsEnabled = true;
         }
         public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
@@ -131,7 +134,7 @@ namespace IgnitionHelper
         }
         private async void B_GenExcelTagData_ClickAsync(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            B_GenExcelTagData.IsEnabled = false;
             String filePath = expFolderPath + @"\TagDataExport.xlsx";
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
@@ -144,7 +147,7 @@ namespace IgnitionHelper
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
             TextblockAddLine(TB_Status, $"\n Created file : {filePath}");
-            this.IsEnabled = true;
+            B_GenExcelTagData.IsEnabled = true;
         }
         private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -196,7 +199,7 @@ namespace IgnitionHelper
         }
         private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            B_EditTagUdt.IsEnabled = false;
             string tagGroup = TB_TagGroup.Text;
             string valueToEdit = TB_ValueToEdit.Text;
             string value = TB_EditValue.Text;
@@ -211,7 +214,7 @@ namespace IgnitionHelper
                 {
                     TagPropertyEditData editData = new();
                     textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
-                    await XmlOperations.EditUdtPropertiesXml(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
+                    await XmlOperations.EditUdtPropertiesXmlAync(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
                     TextblockAddLine(TB_Status, $"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
                     string newName = expFolderPath + @"\" + xmlFile_g.Name;
                     TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
@@ -225,7 +228,7 @@ namespace IgnitionHelper
             }
             else
                 TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
-            this.IsEnabled = true;
+            B_EditTagUdt.IsEnabled = true;
         }
         private void B_TextloggClose_Click(object sender, RoutedEventArgs e)
         {
@@ -234,13 +237,13 @@ namespace IgnitionHelper
         }
         private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            B_EditAlarmUdt.IsEnabled = false;
             if (doc_g.DocumentElement != null)
             {
                 try
                 {
                     AlarmEditData editData = new();
-                    await XmlOperations.EditUdtAlarmsXml(doc_g, doc_g.DocumentElement, editData);
+                    await XmlOperations.EditUdtAlarmsXmlAsync(doc_g, doc_g.DocumentElement, editData);
                     TextblockAddLine(TB_Status, $"\n Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
                     string newName = expFolderPath + @"\" + xmlFile_g.Name;
                     TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
@@ -254,7 +257,7 @@ namespace IgnitionHelper
             }
             else
                 TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
-            this.IsEnabled = true;
+            B_EditAlarmUdt.IsEnabled = true;
         }
         #endregion
         #region UI Functions
