@@ -58,7 +58,7 @@ namespace IgnitionHelper
                 {
                     if (tagDataABList.Count >= 0)
                         tagDataABList.Clear();
-                    tagDataABList = await ExcelOperations.LoadFromExcelFile(tagsFile_g);
+                    tagDataABList = await ExcelOperations.LoadFromExcelFileAsync(tagsFile_g);
                     TextblockAddLine(TB_Status, $"\n Acquired {tagDataABList.Count} tags");
                     B_GenerateXml.IsEnabled = true;
                 }
