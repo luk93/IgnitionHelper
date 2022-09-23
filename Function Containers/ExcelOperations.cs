@@ -15,6 +15,10 @@ namespace IgnitionHelper
             List<TagDataPLC> output = new List<TagDataPLC>();
             var package = new ExcelPackage(file);
             package.LoadAsync(file);
+            if (package.Workbook != null)
+            {
+                return null;
+            }
             var ws = package.Workbook.Worksheets[0];
             int row = 1;
             int col = 1;
@@ -43,7 +47,7 @@ namespace IgnitionHelper
         public static async Task<List<TagDataPLC>> LoadFromExcelFileAsync(FileInfo file)
         {
             var output = new List<TagDataPLC>();
-            return output = await Task.Run(() => LoadFromExcelFileAsync(file));
+            return output = await Task.Run(() => LoadFromExcelFile(file));
         }
         public static ExcelPackage CreateExcelFile(string path, StreamWriter streamWriter)
         {
