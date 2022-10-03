@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
+using IgnitionHelper.Function_Containers;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using static System.Net.WebRequestMethods;
@@ -48,7 +49,7 @@ namespace IgnitionHelper
         #region UI_EventHandlers
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
-            B_SelectDTFromAB.IsEnabled = false;
+            DisableButtonAndChangeCursor(sender);
             tagsFile_g = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
             if (tagsFile_g != null)
             {
@@ -68,12 +69,11 @@ namespace IgnitionHelper
                     TextblockAddLine(TB_Status, $"\n{ex.StackTrace}");
                 }
             }
-            B_SelectDTFromAB.IsEnabled = true;
-
+            EnableButtonAndChangeCursor(sender);
         }
         private async void B_GenerateXml_ClickAsync(object sender, RoutedEventArgs e)
         {
-            B_GenerateXml.IsEnabled = false;
+            DisableButtonAndChangeCursor(sender);
             xmlFile_g = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
             if (xmlFile_g != null)
             {
@@ -104,7 +104,7 @@ namespace IgnitionHelper
                             string newName = expFolderPath + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
                             TextblockAddLine(TB_Status, $"\n Found instances Added in XML and NOT CORRECT: {tagDataABList.Count(item => item.IsAdded && !item.IsCorrect)}");
                             doc_g.Save($"{newName}");
-                            GetFoldersInfo(tagDataABList, TB_Status);
+                            TagsOperations.GetFoldersInfo(tagDataABList, TB_Status);
                             TextblockAddLine(TB_Status, $"\n Saved file: {newName}");
                             foreach (var item in tagDataABList)
                             {
@@ -120,21 +120,11 @@ namespace IgnitionHelper
                     }
                 }
             }
-            B_GenerateXml.IsEnabled = true;
-        }
-        public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
-        {
-            List<string> folderNames = tagDataList.Select(s => s.VisuFolderName).Distinct().ToList();
-
-            foreach (string folderName in folderNames)
-            {
-                var folderCount = tagDataList.Count(tagData => tagData.VisuFolderName == folderName && tagData.IsAdded);
-                TextblockAddLine(textBlock, $"\n Folder name: {folderName} count: {folderCount}");
-            }
+            EnableButtonAndChangeCursor(sender);
         }
         private async void B_GenExcelTagData_ClickAsync(object sender, RoutedEventArgs e)
         {
-            B_GenExcelTagData.IsEnabled = false;
+            DisableButtonAndChangeCursor(sender);
             String filePath = expFolderPath + @"\TagDataExport.xlsx";
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg_g);
             if (excelPackage == null)
@@ -147,7 +137,64 @@ namespace IgnitionHelper
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
             TextblockAddLine(TB_Status, $"\n Created file : {filePath}");
-            B_GenExcelTagData.IsEnabled = true;
+            EnableButtonAndChangeCursor(sender);
+        }
+        private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            DisableButtonAndChangeCursor(sender);
+            if (doc_g.DocumentElement != null)
+            {
+                try
+                {
+                    AlarmEditData editData = new();
+                    await XmlOperations.EditUdtAlarmsXmlAsync(doc_g, doc_g.DocumentElement, editData);
+                    TextblockAddLine(TB_Status, $"\n Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
+                    string newName = expFolderPath + @"\" + xmlFile_g.Name;
+                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
+                    doc_g.Save($"{newName}");
+                }
+                catch (Exception ex)
+                {
+                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
+                }
+            }
+            else
+                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
+            EnableButtonAndChangeCursor(sender);
+        }
+        private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            DisableButtonAndChangeCursor(sender);
+            string tagGroup = TB_TagGroup.Text;
+            string valueToEdit = TB_ValueToEdit.Text;
+            string value = TB_EditValue.Text;
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
+            {
+                TextblockAddLine(TB_Status, "\n Fill all labels!");
+                return;
+            }
+            if (doc_g.DocumentElement != null)
+            {
+                try
+                {
+                    TagPropertyEditData editData = new();
+                    textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
+                    await XmlOperations.EditUdtPropertiesXmlAync(doc_g, doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
+                    TextblockAddLine(TB_Status, $"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
+                    string newName = expFolderPath + @"\" + xmlFile_g.Name;
+                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
+                    doc_g.Save($"{newName}");
+                }
+                catch (Exception ex)
+                {
+                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
+                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
+                }
+            }
+            else
+                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
+            EnableButtonAndChangeCursor(sender);
         }
         private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -197,70 +244,26 @@ namespace IgnitionHelper
                 }
             }
         }
-        private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
-        {
-            B_EditTagUdt.IsEnabled = false;
-            string tagGroup = TB_TagGroup.Text;
-            string valueToEdit = TB_ValueToEdit.Text;
-            string value = TB_EditValue.Text;
-            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
-            {
-                TextblockAddLine(TB_Status, "\n Fill all labels!");
-                return;
-            }
-            if (doc_g.DocumentElement != null)
-            {
-                try
-                {
-                    TagPropertyEditData editData = new();
-                    textLogg_g.WriteLine($"Started editing {xmlFile_g.Name}");
-                    await XmlOperations.EditUdtPropertiesXmlAync(doc_g,doc_g.DocumentElement, editData, textLogg_g, tagGroup, valueToEdit, value);
-                    TextblockAddLine(TB_Status, $"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
-                    string newName = expFolderPath + @"\" + xmlFile_g.Name;
-                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
-                    doc_g.Save($"{newName}");
-                }
-                catch (Exception ex)
-                {
-                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
-                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
-                }
-            }
-            else
-                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
-            B_EditTagUdt.IsEnabled = true;
-        }
         private void B_TextloggClose_Click(object sender, RoutedEventArgs e)
         {
             textLogg_g.WriteLine("Manually closed.");
             textLogg_g.Close();
         }
-        private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
-        {
-            B_EditAlarmUdt.IsEnabled = false;
-            if (doc_g.DocumentElement != null)
-            {
-                try
-                {
-                    AlarmEditData editData = new();
-                    await XmlOperations.EditUdtAlarmsXmlAsync(doc_g, doc_g.DocumentElement, editData);
-                    TextblockAddLine(TB_Status, $"\n Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
-                    string newName = expFolderPath + @"\" + xmlFile_g.Name;
-                    TextblockAddLine(TB_Status, $"\n Saved edited file in: {newName}");
-                    doc_g.Save($"{newName}");
-                }
-                catch (Exception ex)
-                {
-                    TextblockAddLine(TB_Status, $"\n {ex.Message}");
-                    TextblockAddLine(TB_Status, $"\n {ex.StackTrace}");
-                }
-            }
-            else
-                TextblockAddLine(TB_Status, $"\n Xml File is not correct!");
-            B_EditAlarmUdt.IsEnabled = true;
-        }
+
         #endregion
         #region UI Functions
+        public void DisableButtonAndChangeCursor(object sender)
+        {
+            Cursor = Cursors.Wait;
+            Button button = (Button)sender;
+            button.IsEnabled = false;
+        }
+        public void EnableButtonAndChangeCursor(object sender)
+        {
+            Cursor = Cursors.Arrow;
+            Button button = (Button)sender;
+            button.IsEnabled = true;
+        }
         public void EB_ExpFolderSelected()
         {
             B_OpenExpFolder.IsEnabled = true;
