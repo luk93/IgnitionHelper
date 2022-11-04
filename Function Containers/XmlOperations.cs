@@ -30,7 +30,7 @@ namespace IgnitionHelper
                         {
                             if (!String.IsNullOrEmpty(folderName))
                             {
-                                XmlAttribute xmlAttribute = childNode2.Attributes["name"];
+                                XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
                                 if (xmlAttribute != null)
                                 {
                                     if (xmlAttribute.Value == "typeId")
@@ -62,8 +62,8 @@ namespace IgnitionHelper
             {
                 if (childNode1.Name == "Tag")
                 {
-                    XmlAttribute xmlAttribute1 = childNode1.Attributes["type"];
-                    XmlAttribute xmlAttribute2 = childNode1.Attributes["name"];
+                    XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
+                    XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
                     if (xmlAttribute1 != null && xmlAttribute2 != null)
                     {
                         if (!String.IsNullOrEmpty(folderName))
@@ -71,7 +71,7 @@ namespace IgnitionHelper
                             if (xmlAttribute1.Value == "UdtInstance")
                             {
                                 //Search for Instance Of Data Block in Xml by the Name got from Excel
-                                TagDataPLC tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value);
+                                TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value);
                                 if (tagData != null)
                                 {
                                     //Search for Instance Of Data Block Data Type in Xml by the Data Type got from Excel
@@ -79,7 +79,7 @@ namespace IgnitionHelper
                                     {
                                         if (childNode2.Name == "Property")
                                         {
-                                            XmlAttribute xmlAttribute = childNode2.Attributes["name"];
+                                            XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
                                             if (xmlAttribute != null && xmlAttribute.Value == "typeId")
                                             {
                                                 string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
@@ -128,8 +128,8 @@ namespace IgnitionHelper
                 //Find correct folder, where same instances of data type are stored 
                 if (childNode1.Name == "Tag")
                 {
-                    XmlAttribute xmlAttribute1 = childNode1.Attributes["type"];
-                    XmlAttribute xmlAttribute2 = childNode1.Attributes["name"];
+                    XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
+                    XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
                     if (xmlAttribute1 != null && xmlAttribute2 != null)
                     {
                         if (xmlAttribute1.Value == "UdtInstance")
@@ -142,11 +142,11 @@ namespace IgnitionHelper
                                     if (!tagData.IsAdded)
                                     {
                                         //tolerance in names extended
-                                        TempInstanceVisu tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
+                                        TempInstanceVisu? tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
                                                                                             StringExt.Contains(tagData.DataTypePLC, item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
                                         if (tempInst != null)
                                         {
-                                            XmlNode newNode = tempInst.Node.CloneNode(true);
+                                            XmlNode? newNode = tempInst.Node.CloneNode(true);
                                             tempInst.Node.Attributes["name"].Value = tagData.Name;
                                             node.InsertAfter(newNode, node.LastChild);
                                             streamWriter.WriteLine($"Added Node: {tagData.Name}");
@@ -174,8 +174,8 @@ namespace IgnitionHelper
             {
                 if (childNode1.Name == "Tag")
                 {
-                    XmlAttribute tagType = childNode1.Attributes["type"];
-                    XmlAttribute tagName = childNode1.Attributes["name"];
+                    XmlAttribute? tagType = childNode1.Attributes["type"];
+                    XmlAttribute? tagName = childNode1.Attributes["name"];
                     if (tagType != null && tagName != null)
                     {
                         //Find correct group of Tags in Each Tag (for example CB)
@@ -187,7 +187,7 @@ namespace IgnitionHelper
                                 //Change to valueToEdit to value for group of Tags
                                 if (childNode2.Name == "Property")
                                 {
-                                    XmlAttribute valueToEditAtt = childNode2.Attributes["name"];
+                                    XmlAttribute? valueToEditAtt = childNode2.Attributes["name"];
                                     if (valueToEditAtt != null)
                                     {
                                         if (valueToEditAtt.Value == valueToEdit)
@@ -217,7 +217,7 @@ namespace IgnitionHelper
                                             {
                                                 if (childNode4.Name == "Property")
                                                 {
-                                                    XmlAttribute valueToEditAtt = childNode4.Attributes["name"];
+                                                    XmlAttribute? valueToEditAtt = childNode4.Attributes["name"];
                                                     if (valueToEditAtt != null)
                                                     {
                                                         if (valueToEditAtt.Value == valueToEdit)
@@ -273,7 +273,7 @@ namespace IgnitionHelper
             {
                 if (childNode1.Name == "CompoundProperty")
                 {
-                    XmlAttribute tagName = childNode1.Attributes["name"];
+                    XmlAttribute? tagName = childNode1.Attributes["name"];
                     if (tagName != null)
                     {
                         //Find Alarm
@@ -379,8 +379,8 @@ namespace IgnitionHelper
             string result = path;
             if (xmlNode.Name == "Tag")
             {
-                XmlAttribute xmlAttribute1 = xmlNode.Attributes["type"];
-                XmlAttribute xmlAttribute2 = xmlNode.Attributes["name"];
+                XmlAttribute? xmlAttribute1 = xmlNode.Attributes["type"];
+                XmlAttribute? xmlAttribute2 = xmlNode.Attributes["name"];
                 if (xmlAttribute1 != null && xmlAttribute2 != null)
                 {
                     if (xmlAttribute1.Value == "Folder")
