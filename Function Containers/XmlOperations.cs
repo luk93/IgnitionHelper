@@ -18,8 +18,8 @@ namespace IgnitionHelper
             {
                 output = new List<TempInstanceVisu>();
             }
-            path = getPath(node, path);
-            folderName = getFolderName(path);
+            path = GetPath(node, path);
+            folderName = GetFolderName(path);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 if (childNode1.Name == "Tag")
@@ -53,10 +53,10 @@ namespace IgnitionHelper
                 CreateTemplate(childNode1, output, streamWriter, folderName, path);
             }
         }
-        private static void setPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        private static void SetPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
-            path = getPath(node, path);
-            folderName = getFolderName(path);
+            path = GetPath(node, path);
+            folderName = GetFolderName(path);
 
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -116,13 +116,13 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                setPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
+                SetPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
         private static void EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
         {
-            path = getPath(node, path);
-            folderName = getFolderName(path);
+            path = GetPath(node, path);
+            folderName = GetFolderName(path);
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 //Find correct folder, where same instances of data type are stored 
@@ -317,10 +317,10 @@ namespace IgnitionHelper
                                                     string cutName = "{TagName}";
                                                     string textToCut = childNode3.InnerText;
                                                     int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
-                                                    childNode3.InnerText = textToCut.Substring(0, cutPosition);
+                                                    childNode3.InnerText = textToCut[..cutPosition];
                                                     //Edit new Node "label"
                                                     newNode.Attributes["name"].Value = "label";
-                                                    newNode.InnerText = textToCut.Substring(cutPosition, textToCut.Length - cutPosition);
+                                                    newNode.InnerText = textToCut[cutPosition..];
                                                     //Insert new node
                                                     childNode2.InsertAfter(newNode, childNode2.LastChild);
                                                     editData.AlarmChanged++;
@@ -350,9 +350,9 @@ namespace IgnitionHelper
         {
             return Task.Run(() => CreateTemplate(node, output,streamWriter,folderName, path));
         }
-        public static Task setPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        public static Task SetPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
-            return Task.Run(() => setPLCTagInHMIStatus( node, tagDataList,  streamWriter,  folderName,  path));
+            return Task.Run(() => SetPLCTagInHMIStatus( node, tagDataList,  streamWriter,  folderName,  path));
         }
         public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
         {
@@ -367,14 +367,14 @@ namespace IgnitionHelper
             return Task.Run(() => EditUdtAlarmsXml(doc, node, editData));
         }
 
-        private static string getFolderName(string path)
+        private static string GetFolderName(string path)
         {
             string output = "";
             if (!String.IsNullOrEmpty(path))
                 output = path.Substring(path.LastIndexOf(@"/") + 1, path.Length - path.LastIndexOf(@"/") - 1);
             return output;
         }
-        private static string getPath(XmlNode xmlNode, string path)
+        private static string GetPath(XmlNode xmlNode, string path)
         {
             string result = path;
             if (xmlNode.Name == "Tag")
