@@ -28,8 +28,8 @@ namespace IgnitionHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        FileInfo tagsFile_g = null!;
-        FileInfo xmlFile_g = null!;
+        FileInfo? tagsFile_g = null!;
+        FileInfo? xmlFile_g = null!;
         XmlDocument doc_g;
         public static StreamWriter textLogg_g = null!;
         List<TagDataPLC> tagDataABList;
@@ -142,7 +142,7 @@ namespace IgnitionHelper
         private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
-            if (doc_g.DocumentElement != null)
+            if (doc_g.DocumentElement != null && xmlFile_g != null)
             {
                 try
                 {
@@ -174,7 +174,7 @@ namespace IgnitionHelper
                 TextblockAddLine(TB_Status, "\n Fill all labels!");
                 return;
             }
-            if (doc_g.DocumentElement != null)
+            if (doc_g.DocumentElement != null && xmlFile_g != null)
             {
                 try
                 {
@@ -303,7 +303,7 @@ namespace IgnitionHelper
             if (!string.IsNullOrEmpty(text))
                 tb.Inlines.InsertBefore(tb.Inlines.FirstInline, new Run(text));
         }
-        public FileInfo SelectXmlFileAndTryToUse(string title)
+        public FileInfo? SelectXmlFileAndTryToUse(string title)
         {
             OpenFileDialog openFileDialog1 = new()
             {
@@ -333,7 +333,7 @@ namespace IgnitionHelper
                 return null;
             }
         }
-        public FileInfo SelectXlsxFileAndTryToUse(string title)
+        public FileInfo? SelectXlsxFileAndTryToUse(string title)
         {
             OpenFileDialog openFileDialog1 = new()
             {

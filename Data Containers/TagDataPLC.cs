@@ -15,7 +15,7 @@ namespace IgnitionHelper
         public bool IsAdded { get; set; }
         public bool IsCorrect { get; set; }
         public string VisuFolderName { get; set; }
-        public string VisuPath { get; set; }
+        public string? VisuPath { get; set; }
         public TagDataPLC()
         {
             Name = "";

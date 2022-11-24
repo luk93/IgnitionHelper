@@ -26,7 +26,7 @@ namespace IgnitionHelper
                 {
                     foreach (XmlNode childNode2 in childNode1.ChildNodes)
                     {
-                        if (childNode2.Name == "Property")
+                        if (childNode2.Name == "Property" && childNode2.Attributes != null)
                         {
                             if (!String.IsNullOrEmpty(folderName))
                             {
@@ -60,7 +60,7 @@ namespace IgnitionHelper
 
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                if (childNode1.Name == "Tag")
+                if (childNode1.Name == "Tag" && childNode1.Attributes != null)
                 {
                     XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
                     XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
@@ -77,7 +77,7 @@ namespace IgnitionHelper
                                     //Search for Instance Of Data Block Data Type in Xml by the Data Type got from Excel
                                     foreach (XmlNode childNode2 in childNode1.ChildNodes)
                                     {
-                                        if (childNode2.Name == "Property")
+                                        if (childNode2.Name == "Property" && childNode2.Attributes != null)
                                         {
                                             XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
                                             if (xmlAttribute != null && xmlAttribute.Value == "typeId")
@@ -126,7 +126,7 @@ namespace IgnitionHelper
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
                 //Find correct folder, where same instances of data type are stored 
-                if (childNode1.Name == "Tag")
+                if (childNode1.Name == "Tag" && childNode1.Attributes != null)
                 {
                     XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
                     XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
@@ -172,7 +172,7 @@ namespace IgnitionHelper
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                if (childNode1.Name == "Tag")
+                if (childNode1.Name == "Tag" && childNode1.Attributes != null)
                 {
                     XmlAttribute? tagType = childNode1.Attributes["type"];
                     XmlAttribute? tagName = childNode1.Attributes["name"];
@@ -185,7 +185,7 @@ namespace IgnitionHelper
                             foreach (XmlNode childNode2 in childNode1.ChildNodes)
                             {
                                 //Change to valueToEdit to value for group of Tags
-                                if (childNode2.Name == "Property")
+                                if (childNode2.Name == "Property" && childNode2.Attributes != null)
                                 {
                                     XmlAttribute? valueToEditAtt = childNode2.Attributes["name"];
                                     if (valueToEditAtt != null)
@@ -203,7 +203,7 @@ namespace IgnitionHelper
                                 {
                                     foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                     {
-                                        if (childNode3.Name == "Tag")
+                                        if (childNode3.Name == "Tag" && childNode3.Attributes != null)
                                         {
                                             //Edit All tags from this group 
                                             string childTagNameValue = "";
@@ -271,7 +271,7 @@ namespace IgnitionHelper
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                if (childNode1.Name == "CompoundProperty")
+                if (childNode1.Name == "CompoundProperty" && childNode1.Attributes != null)
                 {
                     XmlAttribute? tagName = childNode1.Attributes["name"];
                     if (tagName != null)
@@ -289,15 +289,18 @@ namespace IgnitionHelper
                                     foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                     {
                                         tagName = null;
-                                        tagName = childNode3.Attributes["name"];
-                                        if (tagName != null)
+                                        if (childNode3.Attributes != null)
                                         {
-                                            if (tagName.Value == "label")
+                                            tagName = childNode3.Attributes["name"];
+                                            if (tagName != null)
                                             {
-                                                labelPathFound = true;
-                                                break;
-                                            }
+                                                if (tagName.Value == "label")
+                                                {
+                                                    labelPathFound = true;
+                                                    break;
+                                                }
 
+                                            }
                                         }
                                     }
                                     //If no displayPathFound do needed operations
@@ -306,27 +309,30 @@ namespace IgnitionHelper
                                         foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                         {
                                             tagName = null;
-                                            tagName = childNode3.Attributes["name"];
-                                            if (tagName != null)
+                                            if (childNode3.Attributes != null)
                                             {
-                                                if (tagName.Value == "displayPath")
+                                                tagName = childNode3.Attributes["name"];
+                                                if (tagName != null)
                                                 {
-                                                    //Copy "displayPath" node
-                                                    XmlNode newNode = childNode3.CloneNode(true);
-                                                    //Edit "displayPath node
-                                                    string cutName = "{TagName}";
-                                                    string textToCut = childNode3.InnerText;
-                                                    int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
-                                                    childNode3.InnerText = textToCut[..cutPosition];
-                                                    //Edit new Node "label"
-                                                    newNode.Attributes["name"].Value = "label";
-                                                    newNode.InnerText = textToCut[cutPosition..];
-                                                    //Insert new node
-                                                    childNode2.InsertAfter(newNode, childNode2.LastChild);
-                                                    editData.AlarmChanged++;
-                                                    break;
-                                                }
+                                                    if (tagName.Value == "displayPath")
+                                                    {
+                                                        //Copy "displayPath" node
+                                                        XmlNode newNode = childNode3.CloneNode(true);
+                                                        //Edit "displayPath node
+                                                        string cutName = "{TagName}";
+                                                        string textToCut = childNode3.InnerText;
+                                                        int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
+                                                        childNode3.InnerText = textToCut[..cutPosition];
+                                                        //Edit new Node "label"
+                                                        newNode.Attributes["name"].Value = "label";
+                                                        newNode.InnerText = textToCut[cutPosition..];
+                                                        //Insert new node
+                                                        childNode2.InsertAfter(newNode, childNode2.LastChild);
+                                                        editData.AlarmChanged++;
+                                                        break;
+                                                    }
 
+                                                }
                                             }
                                         }
                                     }
@@ -348,15 +354,15 @@ namespace IgnitionHelper
 
         public static Task CreateTemplateAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
         {
-            return Task.Run(() => CreateTemplate(node, output,streamWriter,folderName, path));
+            return Task.Run(() => CreateTemplate(node, output, streamWriter, folderName, path));
         }
         public static Task SetPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
         {
-            return Task.Run(() => SetPLCTagInHMIStatus( node, tagDataList,  streamWriter,  folderName,  path));
+            return Task.Run(() => SetPLCTagInHMIStatus(node, tagDataList, streamWriter, folderName, path));
         }
         public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
         {
-            return Task.Run(() => EditXml( node, tagDataList, tempInstList, streamWriter, folderName, path));
+            return Task.Run(() => EditXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
         }
         public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
@@ -377,7 +383,7 @@ namespace IgnitionHelper
         private static string GetPath(XmlNode xmlNode, string path)
         {
             string result = path;
-            if (xmlNode.Name == "Tag")
+            if (xmlNode.Name == "Tag" && xmlNode.Attributes != null)
             {
                 XmlAttribute? xmlAttribute1 = xmlNode.Attributes["type"];
                 XmlAttribute? xmlAttribute2 = xmlNode.Attributes["name"];
