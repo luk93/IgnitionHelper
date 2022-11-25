@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using IgnitionHelper.Extensions;
 using static OfficeOpenXml.ExcelErrorValue;
 
 namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        private static void CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
+        private static void CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
             if (output == null)
             {
@@ -53,7 +54,7 @@ namespace IgnitionHelper
                 CreateTemplate(childNode1, output, streamWriter, folderName, path);
             }
         }
-        private static void SetPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        private static void SetPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -119,7 +120,7 @@ namespace IgnitionHelper
                 SetPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
-        private static void EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
+        private static void EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -215,7 +216,7 @@ namespace IgnitionHelper
                                             bool tagPropFound = false;
                                             foreach (XmlNode childNode4 in childNode3.ChildNodes)
                                             {
-                                                if (childNode4.Name == "Property")
+                                                if (childNode4.Name == "Property" && childNode4.Attributes != null)
                                                 {
                                                     XmlAttribute? valueToEditAtt = childNode4.Attributes["name"];
                                                     if (valueToEditAtt != null)
@@ -236,7 +237,7 @@ namespace IgnitionHelper
                                                 XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
                                                 XmlAttribute xmlAttribute = doc.CreateAttribute("name");
                                                 xmlAttribute.Value = valueToEdit;
-                                                newNode.Attributes.SetNamedItem(xmlAttribute);
+                                                if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
                                                 newNode.InnerText = value;
                                                 editData.TagPropAdded++;
                                                 childNode3.InsertAfter(newNode, childNode3.LastChild);
@@ -252,7 +253,7 @@ namespace IgnitionHelper
                                 XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
                                 XmlAttribute xmlAttribute = doc.CreateAttribute("name");
                                 xmlAttribute.Value = valueToEdit;
-                                newNode.Attributes.SetNamedItem(xmlAttribute);
+                                if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
                                 newNode.InnerText = value;
                                 editData.GroupPropAdded++;
                                 childNode1.InsertAfter(newNode, childNode1.LastChild);
@@ -324,7 +325,7 @@ namespace IgnitionHelper
                                                         int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
                                                         childNode3.InnerText = textToCut[..cutPosition];
                                                         //Edit new Node "label"
-                                                        newNode.Attributes["name"].Value = "label";
+                                                        if (newNode.Attributes != null) newNode.Attributes["name"].Value = "label";
                                                         newNode.InnerText = textToCut[cutPosition..];
                                                         //Insert new node
                                                         childNode2.InsertAfter(newNode, childNode2.LastChild);
@@ -352,15 +353,15 @@ namespace IgnitionHelper
             }
         }
 
-        public static Task CreateTemplateAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string folderName, string path)
+        public static Task CreateTemplateAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
             return Task.Run(() => CreateTemplate(node, output, streamWriter, folderName, path));
         }
-        public static Task SetPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string path)
+        public static Task SetPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
         {
             return Task.Run(() => SetPLCTagInHMIStatus(node, tagDataList, streamWriter, folderName, path));
         }
-        public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string folderName, string path)
+        public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
         {
             return Task.Run(() => EditXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
         }
@@ -373,16 +374,16 @@ namespace IgnitionHelper
             return Task.Run(() => EditUdtAlarmsXml(doc, node, editData));
         }
 
-        private static string GetFolderName(string path)
+        private static string GetFolderName(string? path)
         {
             string output = "";
             if (!String.IsNullOrEmpty(path))
                 output = path.Substring(path.LastIndexOf(@"/") + 1, path.Length - path.LastIndexOf(@"/") - 1);
             return output;
         }
-        private static string GetPath(XmlNode xmlNode, string path)
+        private static string? GetPath(XmlNode xmlNode, string? path)
         {
-            string result = path;
+            string? result = path;
             if (xmlNode.Name == "Tag" && xmlNode.Attributes != null)
             {
                 XmlAttribute? xmlAttribute1 = xmlNode.Attributes["type"];

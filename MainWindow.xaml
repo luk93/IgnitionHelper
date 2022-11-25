@@ -192,6 +192,59 @@
                     </Button>
                 </Grid>
             </TabItem>
+            <!--Tag/uDT JSON editor Tab-->
+            <TabItem Header="Tag/uDT JSON Editor">
+                <TabItem.Background>
+                    <LinearGradientBrush EndPoint="0,1">
+                        <GradientStop Color="#FFF0F0F0"/>
+                        <GradientStop Color="#FFB5A3A3" Offset="1"/>
+                    </LinearGradientBrush>
+                </TabItem.Background>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20*"/>
+                        <RowDefinition Height="20*"/>
+                        <RowDefinition Height="20*"/>
+                        <RowDefinition Height="20*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FF9EA2A1"/>
+                            <GradientStop Color="White" Offset="1"/>
+                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Button x:Name ="B_SelectJsonToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectJsonToEdit_Click" IsEnabled="True">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <TextBlock x:Name="L_SelectedJsonToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
+                    <Label Content="Object to Edit" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_JsonObjectToEdit" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="CB" VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Label Content="Value To Edit" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_JsonValueToEdit" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup"  VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Label Content="Edit Value" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_JsonEditValue" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup_CB" VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Button x:Name ="B_EditTagUdtJson" Grid.Column="3" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdtJson_Click" IsEnabled="False">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF898C8A"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </Grid>
+            </TabItem>
         </TabControl>
         <Button x:Name ="B_SelectExpFolder" Content="Select path" HorizontalAlignment="Left" Margin="19,26,0,0" VerticalAlignment="Top" Width="66" Click="B_SelectExpFolder_Click" Height="20">
             <Button.Background>
