@@ -272,15 +272,23 @@ namespace IgnitionHelper
         }
         private void B_EditTagUdtJson_Click(object sender, RoutedEventArgs e)
         {
+           
             if (jsonFile_g != null && json_g != null)
             {
-                IEnumerable<JToken> tokens = from p in json_g["tags"]
-                                             select p;
-                tokens = tokens.OrderBy(t => Int32.Parse(t["name"].Value<string>().Split('_')[2]));
-                foreach (var token in tokens)
+                int arrayIndexToFind = -1;
+                string propertyToEdit = TB_JsonPropertyToMultiply.Text;
+                if (propertyToEdit == string.Empty)
                 {
-                    TB_Status.AddLine($"\n{token["name"].Value<string>()}");
+                    TB_Status.AddLine("\nProperty to edit is empty! Enter property name to edit");
+                    return;
                 }
+                if (TB_JsonIndexToMultiply.Text == string.Empty || !int.TryParse(TB_JsonIndexToMultiply.Text, out arrayIndexToFind) || arrayIndexToFind <= -1)
+                {
+                    TB_Status.AddLine("\nIndex is not correct! Must be a number and greater or equal 0!");
+                    return;
+                }
+                var result = JsonOperations.MultiplyProperties(json_g, jsonFile_g, expFolderPath, propertyToEdit, arrayIndexToFind, textLogg_g);
+                TB_Status.AddLine(result);
             }
         }
         #endregion

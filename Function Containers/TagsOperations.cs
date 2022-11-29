@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IgnitionHelper.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace IgnitionHelper.Function_Containers
             foreach (string folderName in folderNames)
             {
                 var folderCount = tagDataList.Count(tagData => tagData.VisuFolderName == folderName && tagData.IsAdded);
-                MainWindow.TextblockAddLine(textBlock, $"\n Folder name: {folderName} count: {folderCount}");
+                textBlock.AddLine($"\n Folder name: {folderName} count: {folderCount}");
             }
         }
     }

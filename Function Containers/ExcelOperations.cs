@@ -40,7 +40,7 @@ namespace IgnitionHelper
             }
             return output;
         }
-        public static ExcelPackage CreateExcelFile(string path, StreamWriter streamWriter)
+        public static ExcelPackage? CreateExcelFile(string path, StreamWriter streamWriter)
         {
             var file = new FileInfo(path);
             if (file.Exists)

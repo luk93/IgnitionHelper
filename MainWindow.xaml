@@ -229,10 +229,10 @@
                         </Button.Background>
                     </Button>
                     <TextBlock x:Name="L_SelectedJsonToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
-                    <Label Content="Object to Edit" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_JsonObjectToEdit" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="CB" VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Label Content="Value To Edit" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_JsonValueToEdit" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup"  VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Label Content="Index to Multiply" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_JsonIndexToMultiply" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Label Content="Property To Multiply" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_JsonPropertyToMultiply" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tags"  VerticalAlignment="Top" Width="140" Height="20"/>
                     <Label Content="Edit Value" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
                     <TextBox x:Name="TB_JsonEditValue" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup_CB" VerticalAlignment="Top" Width="140" Height="20"/>
                     <Button x:Name ="B_EditTagUdtJson" Grid.Column="3" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdtJson_Click" IsEnabled="False">
