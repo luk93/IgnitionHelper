@@ -264,6 +264,7 @@ namespace IgnitionHelper
                 L_SelectedJsonToEditPath.Text = jsonFile_g.FullName;
                 TB_Status.AddLine($"\n Selected json file to Edit : {jsonFile_g.FullName}");
                 json_g = JObject.Parse(System.IO.File.ReadAllText(jsonFile_g.FullName));
+
                 if (jsonFile_g != null)
                 {
                     B_EditTagUdtJson.IsEnabled = true;
