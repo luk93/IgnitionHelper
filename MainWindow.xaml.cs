@@ -268,6 +268,7 @@ namespace IgnitionHelper
                 if (jsonFile_g != null)
                 {
                     B_EditTagUdtJson.IsEnabled = true;
+                    B_MultiplyTagUdtJson.IsEnabled = true;
                 }
             }
         }
@@ -431,5 +432,26 @@ namespace IgnitionHelper
             }
         }
         #endregion
+
+        private void B_MultiplyTagUdtJson_Click(object sender, RoutedEventArgs e)
+        {
+            if (jsonFile_g != null && json_g != null)
+            {
+                string propertyToEdit = TB_JsonPropertyToMultiply.Text;
+                string nodeNameToMultiply = TB_NodeNameToMultiply.Text;
+                if (propertyToEdit == string.Empty)
+                {
+                    TB_Status.AddLine("\nProperty to edit is empty! Enter property name to edit");
+                    return;
+                }
+                if (nodeNameToMultiply == "nodeNameToMultiply")
+                {
+                    TB_Status.AddLine("\nEdit Node name to multiply!");
+                    return;
+                }
+                var result = JsonOperations.MultiplyTag(json_g, jsonFile_g, expFolderPath, propertyToEdit, nodeNameToMultiply, textLogg_g);
+                TB_Status.AddLine(result);
+            }
+        }
     }
 }

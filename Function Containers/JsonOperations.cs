@@ -14,6 +14,9 @@ namespace IgnitionHelper.Function_Containers
         public static string MultiplyProperties(JObject jsonObj, FileInfo jsonFile, string exportPath, string propertyToEdit, int arrayIndexToFind, StreamWriter streamWriter)
         {
             JToken? copiedtoken = null;
+            string? copiedName = jsonObj["name"]?.Value<string>();
+            if (copiedName == null) 
+                return "root json object name is null!"; 
 
             IEnumerable<JToken> tokens = from p in jsonObj[propertyToEdit]
                                          select p;
@@ -39,9 +42,8 @@ namespace IgnitionHelper.Function_Containers
                 }
             }
             if (copiedtoken == null)
-            {
                 return $"Node: {propertyToEdit},  Index: {arrayIndexToFind} is null!";
-            }
+            
             foreach (var token in tokens)
             {
                 try
@@ -51,10 +53,7 @@ namespace IgnitionHelper.Function_Containers
 
                     if (arrayIndexFound != arrayIndexToFind)
                     {
-                        //Hardset for now
-                        var tokensName = token["name"];
-
-                        var tokenString = JsonConvert.SerializeObject(copiedtoken).Replace($"[{arrayIndexToFind}]", $"[{arrayIndexFound}]");
+                        var tokenString = JsonConvert.SerializeObject(copiedtoken).Replace($"{copiedName}[{arrayIndexToFind}]", $"{copiedName}[{arrayIndexFound}]");
                         JToken? newToken = JsonConvert.DeserializeObject(tokenString) as JToken;
                         if (newToken == null)
                         {
@@ -63,7 +62,7 @@ namespace IgnitionHelper.Function_Containers
                         else
                         {
                             token[propertyToEdit] = newToken;
-                            streamWriter.WriteLineAsync($"\nEdited token[{arrayIndexFound}] -> property name: {propertyToEdit}");
+                            streamWriter.WriteLineAsync($"\nEdited token {copiedName}[{arrayIndexFound}] -> property name: {propertyToEdit}");
                         }
 
                     }
@@ -89,5 +88,44 @@ namespace IgnitionHelper.Function_Containers
                 return ex.Message;
             }
         }
+        public static string MultiplyTag(JObject jsonObj, FileInfo jsonFile, string exportPath, string propertyToEdit, string tagNameToMultiply, StreamWriter streamWriter)
+        {
+            JToken? copiedToken = null;
+            List<JToken> newTokens = new List<JToken>();
+
+            IEnumerable<JToken> tokens = from p in jsonObj[propertyToEdit]
+                                         select p;
+            List<string?> tagNames = new List<string?>();
+            foreach (var token in tokens)
+            {
+                tagNames.Add(token["name"]?.Value<string>());
+                if(copiedToken == null && (token["name"]?.Value<string>() == tagNameToMultiply))
+                {
+                    copiedToken = token;
+                }
+            }
+            if (copiedToken == null)
+                return "Copied token is null!";
+            foreach (var tagName in tagNames)
+            {
+                var token = copiedToken.DeepClone();
+                token["name"] = tagName;
+                newTokens.Add(token);
+                streamWriter.WriteLine($"Added token tagName: {tagName}");
+            }
+
+            var serializedTokens = JsonConvert.SerializeObject(newTokens);
+            string newJsonPath = exportPath + @"\" + jsonFile.Name.Replace(".json", "_edit.json");
+            try
+            {
+                File.WriteAllText(newJsonPath, serializedTokens, Encoding.UTF8);
+                return $"Saved new file {newJsonPath}";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
     }
 }
