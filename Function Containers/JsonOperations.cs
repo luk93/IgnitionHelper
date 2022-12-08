@@ -15,7 +15,7 @@ namespace IgnitionHelper.Function_Containers
         {
             JToken? copiedtoken = null;
             string? copiedName = jsonObj["name"]?.Value<string>();
-            if (copiedName == null) 
+            if (copiedName == null)
                 return "root json object name is null!"; 
 
             IEnumerable<JToken> tokens = from p in jsonObj[propertyToEdit]
@@ -72,15 +72,15 @@ namespace IgnitionHelper.Function_Containers
                     return ex.Message;
                 }
             }
-            var newJson = jsonObj;
-            var serializedTokens = JsonConvert.SerializeObject(tokens);
-            //TO DO
-            //newJson[propertyToEdit] = tokens as JProperty;
-            //var serializedJson = JsonConvert.SerializeObject(newJson);
+            var newJsonObject = jsonObj.DeepClone();
+            if (newJsonObject == null || newJsonObject[propertyToEdit] == null) return "Cloning root Json Object failed!";
+            newJsonObject[propertyToEdit].Replace((JArray)JToken.FromObject(tokens));
+            var serializedJson = JsonConvert.SerializeObject(newJsonObject);
             string newJsonPath = exportPath + @"\" + jsonFile.Name.Replace(".json", "_edit.json");
             try
             {
-                File.WriteAllText(newJsonPath, serializedTokens, Encoding.UTF8);
+                //File.WriteAllText(newJsonPath, serializedTokens, Encoding.UTF8);
+                File.WriteAllText(newJsonPath, serializedJson, Encoding.UTF8);
                 return $"Saved new file {newJsonPath}";
             }
             catch (Exception ex)
@@ -113,12 +113,14 @@ namespace IgnitionHelper.Function_Containers
                 newTokens.Add(token);
                 streamWriter.WriteLine($"Added token tagName: {tagName}");
             }
-
-            var serializedTokens = JsonConvert.SerializeObject(newTokens);
+            var newJsonObject = jsonObj.DeepClone();
+            if (newJsonObject == null || newJsonObject[propertyToEdit] == null) return "Cloning root Json Object failed!";
+            newJsonObject[propertyToEdit].Replace((JArray)JToken.FromObject(tokens));
+            var serializedJson = JsonConvert.SerializeObject(newJsonObject);
             string newJsonPath = exportPath + @"\" + jsonFile.Name.Replace(".json", "_edit.json");
             try
             {
-                File.WriteAllText(newJsonPath, serializedTokens, Encoding.UTF8);
+                File.WriteAllText(newJsonPath, serializedJson, Encoding.UTF8);
                 return $"Saved new file {newJsonPath}";
             }
             catch (Exception ex)

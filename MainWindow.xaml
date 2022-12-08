@@ -202,7 +202,7 @@
                 </TabItem.Background>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="30*"/>
                         <ColumnDefinition Width="20*"/>
                         <ColumnDefinition Width="20*"/>
                         <ColumnDefinition Width="20*"/>
@@ -229,13 +229,11 @@
                         </Button.Background>
                     </Button>
                     <TextBlock x:Name="L_SelectedJsonToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
-                    <Label Content="Index to Multiply" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <Label Content="Array Index/NodeName to Multiply" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
                     <TextBox x:Name="TB_JsonIndexToMultiply" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="140" Height="20"/>
                     <Label Content="Property To Multiply" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_JsonPropertyToMultiply" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tags"  VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Label Content="Edit Value" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_JsonEditValue" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup_CB" VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Button x:Name ="B_EditTagUdtJson" Grid.Column="3" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdtJson_Click" IsEnabled="False">
+                    <TextBox x:Name="TB_JsonPropertyToMultiply" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" Text="tags"  VerticalAlignment="Center" Width="140" Height="20"/>
+                    <Button x:Name ="B_EditTagUdtJson" Grid.Column="3" Grid.Row="2" Content="Edit Array" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdtJson_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FF898C8A"/>
@@ -244,7 +242,7 @@
                         </Button.Background>
                     </Button>
                     <TextBox x:Name="TB_NodeNameToMultiply" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="nodeNameToMultiply" VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Button x:Name ="B_MultiplyTagUdtJson" Grid.Column="3" Grid.Row="3" Content="Multiply" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_MultiplyTagUdtJson_Click" IsEnabled="False">
+                    <Button x:Name ="B_MultiplyTagUdtJson" Grid.Column="3" Grid.Row="3" Content="Multiply Node" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_MultiplyTagUdtJson_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FF898C8A"/>
