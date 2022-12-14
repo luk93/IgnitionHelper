@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IgnitionHelper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="493" Width="800" MinWidth="600" MinHeight="300">
+        Title="MainWindow" Height="493" Width="800" MinWidth="600" MinHeight="300" 
+        Background="#546A76"
+        Foreground="#F5E9E2">
     <Grid Margin="0,0,0,20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180*"/>
@@ -24,25 +26,25 @@
         <Button x:Name ="B_TextloggClose" Grid.Row="0" Grid.Column="2" Content="LoggClose" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Height="20" Click="B_TextloggClose_Click" Margin="5,28,0,0" IsEnabled="true">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF898C8A"/>
-                    <GradientStop Color="White" Offset="1"/>
+                    <GradientStop Color="#547A80"/>
+                    <GradientStop Color="#F5E9E2" Offset="1"/>
                 </LinearGradientBrush>
             </Button.Background>
         </Button>
-        <GroupBox Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Header="Export Folder" Width="Auto" Margin="10,5,5,5"/>
+        <GroupBox Foreground="#F5E9E2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Header="Export Folder" Width="Auto" Margin="10,5,5,5"/>
         <ScrollViewer Grid.Row="3" Grid.ColumnSpan="3" Margin="10,10,10,0" CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Grid.RowSpan="2">
             <TextBlock x:Name= "TB_Status"  TextWrapping="Wrap"  Height="Auto" Width="Auto" ><Run Language="pl-pl"/><LineBreak/><Run Language="pl-pl"/></TextBlock>
         </ScrollViewer>
         <!--Tab Control-->
-        <TabControl Grid.ColumnSpan="3" Margin="10,1,9,4" Grid.RowSpan="2" Grid.Row="1">
+        <TabControl  Foreground="#F5E9E2" Grid.ColumnSpan="3" Margin="10,1,9,4" Grid.RowSpan="2" Grid.Row="1">
             <!--DataTypeInstance Tab-->
             <TabItem Header="DataTypeInstance">
                 <Grid>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF9EA2A1"/>
-                            <GradientStop Color="White" Offset="1"/>
-                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                            <GradientStop Color="#547A80"/>
+                            <GradientStop Color="#F5E9E2" Offset="1"/>
+                            <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
                     <Grid.ColumnDefinitions>
@@ -60,24 +62,24 @@
                     <Button x:Name ="B_SelectTagsXLSX" Grid.Row="0" Grid.Column="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_ClickAsync" Height="20" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
                     <Button x:Name ="B_GenerateXml" Grid.Row="1" Grid.Column="0" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenerateXml_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
                     <Button x:Name ="B_GenExcelTagData" Grid.Row="2" Grid.Column="0" Content="Generate TagData (.xlsx)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenExcelTagData_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -108,24 +110,24 @@
                     </Grid.RowDefinitions>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF9EA2A1"/>
-                            <GradientStop Color="White" Offset="1"/>
-                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                            <GradientStop Color="#547A80"/>
+                            <GradientStop Color="#F5E9E2" Offset="1"/>
+                            <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
                     <Button x:Name ="B_SelectDTFromAB" Grid.Column="0" Grid.Row="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectDTFromAB_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
                     <Button x:Name ="B_SelectDTFromHMI" Grid.Column="0" Grid.Row="1" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Margin="5,5,0,0" Click="B_SelectDTFromHMI_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -154,16 +156,16 @@
                     </Grid.RowDefinitions>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF9EA2A1"/>
-                            <GradientStop Color="White" Offset="1"/>
-                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                            <GradientStop Color="#547A80"/>
+                            <GradientStop Color="#F5E9E2" Offset="1"/>
+                            <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
                     <Button x:Name ="B_SelectFileToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectFileToEdit_Click" IsEnabled="True">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -177,16 +179,16 @@
                     <Button x:Name ="B_EditTagUdt" Grid.Column="3" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdt_ClickAsync" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
                     <Button x:Name ="B_EditAlarmUdt" Grid.Column="3" Grid.Row="3" Content="Edit Alarms" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditAlarmUdt_ClickAsync" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -215,16 +217,16 @@
                     </Grid.RowDefinitions>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF9EA2A1"/>
-                            <GradientStop Color="White" Offset="1"/>
-                            <GradientStop Color="#FFE2E6E5" Offset="0.493"/>
+                            <GradientStop Color="#547A80"/>
+                            <GradientStop Color="#F5E9E2" Offset="1"/>
+                            <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
                     <Button x:Name ="B_SelectJsonToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectJsonToEdit_Click" IsEnabled="True">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -236,8 +238,8 @@
                     <Button x:Name ="B_EditTagUdtJson" Grid.Column="3" Grid.Row="2" Content="Edit Array" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdtJson_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -245,8 +247,8 @@
                     <Button x:Name ="B_MultiplyTagUdtJson" Grid.Column="3" Grid.Row="3" Content="Multiply Node" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_MultiplyTagUdtJson_Click" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF898C8A"/>
-                                <GradientStop Color="White" Offset="1"/>
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -256,8 +258,8 @@
         <Button x:Name ="B_SelectExpFolder" Content="Select path" HorizontalAlignment="Left" Margin="19,26,0,0" VerticalAlignment="Top" Width="66" Click="B_SelectExpFolder_Click" Height="20">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF898C8A"/>
-                    <GradientStop Color="White" Offset="1"/>
+                    <GradientStop Color="#547A80"/>
+                    <GradientStop Color="#F5E9E2" Offset="1"/>
                 </LinearGradientBrush>
             </Button.Background>
         </Button>
@@ -265,8 +267,8 @@
         <Button x:Name ="B_OpenExpFolder" Content="Open" HorizontalAlignment="Left" Margin="90,26,0,0" VerticalAlignment="Top" Width="66" Click="B_OpenExpFolder_Click" Height="20" IsEnabled="False">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF898C8A"/>
-                    <GradientStop Color="White" Offset="1"/>
+                    <GradientStop Color="#547A80"/>
+                    <GradientStop Color="#F5E9E2" Offset="1"/>
                 </LinearGradientBrush>
             </Button.Background>
         </Button>
