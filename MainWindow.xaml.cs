@@ -116,7 +116,7 @@ namespace IgnitionHelper
                             TB_Status.AddLine($"\n Saved file: {newName}");
                             foreach (var item in tagDataABList)
                             {
-                                textLogg_g.WriteLine($"name:{item.Name};dataType:{item.DataTypePLC};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
+                                textLogg_g.WriteLine($"name:{item.Name};dataTypePLC:{item.DataTypePLC};dataTypeVisu:{item.DataTypeVisu};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
                             }
                             B_GenExcelTagData.IsEnabled = true;
                         }

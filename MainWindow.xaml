@@ -222,7 +222,7 @@
                             <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
-                    <Button x:Name ="B_SelectJsonToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectJsonToEdit_Click" IsEnabled="True">
+                    <Button x:Name ="B_SelectJsonToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.json)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectJsonToEdit_Click" IsEnabled="True">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -230,7 +230,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <TextBlock x:Name="L_SelectedJsonToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
+                    <TextBlock x:Name="L_SelectedJsonToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.json) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
                     <Label Content="Array Index/NodeName to Multiply" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
                     <TextBox x:Name="TB_JsonIndexToMultiply" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="140" Height="20"/>
                     <Label Content="Property To Multiply" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>

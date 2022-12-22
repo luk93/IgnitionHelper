@@ -72,7 +72,7 @@ namespace IgnitionHelper
                             if (xmlAttribute1.Value == "UdtInstance")
                             {
                                 //Search for Instance Of Data Block in Xml by the Name got from Excel
-                                TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value);
+                                TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value && item.DataTypePLC != string.Empty);
                                 if (tagData != null)
                                 {
                                     //Search for Instance Of Data Block Data Type in Xml by the Data Type got from Excel
@@ -83,17 +83,17 @@ namespace IgnitionHelper
                                             XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
                                             if (xmlAttribute != null && xmlAttribute.Value == "typeId")
                                             {
-                                                string name = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
-                                                if (name != null)
+                                                string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                                                if (dtVisuName != null)
                                                 {
                                                     //string tolerance is both side:
-                                                    if ((StringExt.Contains(name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, name, StringComparison.OrdinalIgnoreCase)))
+                                                    if ((StringExt.Contains(dtVisuName, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
                                                         tagData.VisuFolderName = folderName;
                                                         tagData.VisuPath = path;
-                                                        tagData.DataTypeVisu = name;
+                                                        tagData.DataTypeVisu = dtVisuName;
                                                         streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and Correct");
                                                     }
                                                     else
@@ -102,9 +102,38 @@ namespace IgnitionHelper
                                                         tagData.IsCorrect = false;
                                                         tagData.VisuFolderName = folderName;
                                                         tagData.VisuPath = path;
-                                                        tagData.DataTypeVisu = name;
+                                                        tagData.DataTypeVisu = dtVisuName;
                                                         streamWriter.WriteLine($"Set tag {tagData.Name} as IsAdded and NOT Correct");
                                                     }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else //Add tag which is not in PLC, only in Visu
+                                {
+                                    var udtName = xmlAttribute2.Value;
+                                    foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                                    {
+                                        if (childNode2.Name == "Property" && childNode2.Attributes != null)
+                                        {
+                                            XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
+                                            if (xmlAttribute != null && xmlAttribute.Value == "typeId")
+                                            {
+                                                string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                                                if (dtVisuName != null)
+                                                {
+                                                    TagDataPLC newTag = new()
+                                                    {
+                                                        IsAdded = true,
+                                                        IsCorrect = false,
+                                                        Name = udtName,
+                                                        VisuFolderName = folderName,
+                                                        VisuPath = path,
+                                                        DataTypeVisu = dtVisuName,
+                                                    };
+                                                    tagDataList.Add(newTag);
+                                                    streamWriter.WriteLine($"Found Visu tag: {udtName} dataType: {dtVisuName} which is not in PLC!");
                                                 }
                                             }
                                         }

@@ -18,13 +18,13 @@ namespace IgnitionHelper
         public string? VisuPath { get; set; }
         public TagDataPLC()
         {
-            Name = "";
-            DataTypePLC = "";
-            DataTypeVisu = "";
+            Name = string.Empty;
+            DataTypePLC = string.Empty;
+            DataTypeVisu = string.Empty;
             IsAdded = false;
             IsCorrect = false;
-            VisuFolderName = "";
-            VisuPath = "";
+            VisuFolderName = string.Empty;
+            VisuPath = string.Empty;
         }
         public TagDataPLC(string name, string dataTypePLC, string dataTypeVisu)
         {
@@ -32,8 +32,8 @@ namespace IgnitionHelper
             DataTypePLC = dataTypePLC;
             IsAdded = false;
             IsCorrect = false;
-            VisuFolderName = "";
-            VisuPath = "";
+            VisuFolderName = string.Empty;
+            VisuPath = string.Empty;
         }
     }
 }
