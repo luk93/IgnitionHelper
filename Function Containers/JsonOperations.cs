@@ -115,7 +115,7 @@ namespace IgnitionHelper.Function_Containers
             }
             var newJsonObject = jsonObj.DeepClone();
             if (newJsonObject == null || newJsonObject[propertyToEdit] == null) return "Cloning root Json Object failed!";
-            newJsonObject[propertyToEdit].Replace((JArray)JToken.FromObject(tokens));
+            newJsonObject[propertyToEdit].Replace((JArray)JToken.FromObject(newTokens));
             var serializedJson = JsonConvert.SerializeObject(newJsonObject);
             string newJsonPath = exportPath + @"\" + jsonFile.Name.Replace(".json", "_edit.json");
             try
