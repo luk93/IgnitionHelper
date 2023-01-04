@@ -10,7 +10,7 @@ namespace IgnitionHelper
 {
     public static class ExcelOperations
     {
-        public static async Task<List<TagDataPLC>> LoadFromExcelFile(FileInfo file)
+        public static async Task<List<TagDataPLC>> LoadTagDataListFromExcelFile(FileInfo file)
         {
             List<TagDataPLC> output = new List<TagDataPLC>();
             var package = new ExcelPackage(file);

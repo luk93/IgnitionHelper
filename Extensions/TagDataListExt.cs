@@ -1,16 +1,15 @@
-﻿using IgnitionHelper.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace IgnitionHelper.Function_Containers
+namespace IgnitionHelper.Extensions
 {
-    static class TagsOperations
+    static class TagDataListExt
     {
-        public static void GetFoldersInfo(List<TagDataPLC> tagDataList, TextBlock textBlock)
+        public static void GetFoldersInfo(this List<TagDataPLC> tagDataList, TextBlock textBlock)
         {
             List<string> folderNames = tagDataList.Select(s => s.VisuFolderName).Distinct().ToList();
 

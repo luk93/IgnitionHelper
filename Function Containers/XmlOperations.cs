@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using System.Xml.Serialization;
 using IgnitionHelper.Extensions;
 using static OfficeOpenXml.ExcelErrorValue;
 
@@ -13,7 +14,7 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
-        private static void CreateTemplate(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
+        private static void CreateTemplates(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
             if (output == null)
             {
@@ -51,10 +52,10 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                CreateTemplate(childNode1, output, streamWriter, folderName, path);
+                CreateTemplates(childNode1, output, streamWriter, folderName, path);
             }
         }
-        private static void SetPLCTagInHMIStatus(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
+        private static void UpdateTagDataListWithXmlData(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -112,32 +113,7 @@ namespace IgnitionHelper
                                 }
                                 else //Add tag which is not in PLC, only in Visu
                                 {
-                                    var udtName = xmlAttribute2.Value;
-                                    foreach (XmlNode childNode2 in childNode1.ChildNodes)
-                                    {
-                                        if (childNode2.Name == "Property" && childNode2.Attributes != null)
-                                        {
-                                            XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
-                                            if (xmlAttribute != null && xmlAttribute.Value == "typeId")
-                                            {
-                                                string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
-                                                if (dtVisuName != null)
-                                                {
-                                                    TagDataPLC newTag = new()
-                                                    {
-                                                        IsAdded = true,
-                                                        IsCorrect = false,
-                                                        Name = udtName,
-                                                        VisuFolderName = folderName,
-                                                        VisuPath = path,
-                                                        DataTypeVisu = dtVisuName,
-                                                    };
-                                                    tagDataList.Add(newTag);
-                                                    streamWriter.WriteLine($"Found Visu tag: {udtName} dataType: {dtVisuName} which is not in PLC!");
-                                                }
-                                            }
-                                        }
-                                    }
+                                    AddOnlyHMITagToTagDataList(childNode1, xmlAttribute2, tagDataList, streamWriter, folderName, path);
                                 }
                             }
                         }
@@ -146,10 +122,70 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                SetPLCTagInHMIStatus(childNode1, tagDataList, streamWriter, folderName, path);
+                UpdateTagDataListWithXmlData(childNode1, tagDataList, streamWriter, folderName, path);
             }
         }
-        private static void EditXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
+        private static void AddOnlyHMITagToTagDataList(XmlNode node, XmlAttribute udtAttribute, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string? path)
+        {
+            var udtName = udtAttribute.Value;
+            foreach (XmlNode childNode2 in node.ChildNodes)
+            {
+                if (childNode2.Name == "Property" && childNode2.Attributes != null)
+                {
+                    XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
+                    if (xmlAttribute != null && xmlAttribute.Value == "typeId")
+                    {
+                        string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                        if (dtVisuName != null)
+                        {
+                            TagDataPLC newTag = new()
+                            {
+                                IsAdded = true,
+                                IsCorrect = false,
+                                Name = udtName,
+                                VisuFolderName = folderName,
+                                VisuPath = path,
+                                DataTypeVisu = dtVisuName,
+                            };
+                            tagDataList.Add(newTag);
+                            streamWriter.WriteLine($"Found Visu tag: {udtName} dataType: {dtVisuName} which is not in PLC!");
+                        }
+                    }
+                }
+            }
+        }
+        private static void DeleteOnlyHMITags(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
+        {
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                if (childNode1.Name == "Tag" && childNode1.Attributes != null)
+                {
+                    XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
+                    XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
+                    if (xmlAttribute1 != null && xmlAttribute2 != null)
+                    {
+                        if (xmlAttribute1.Value == "UdtInstance")
+                        {
+                            //Search for HMI Only Tag
+                            TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value
+                                                                           && item.DataTypePLC == string.Empty && item.DataTypeVisu != string.Empty
+                                                                           && !item.VisuPath.Contains(excludeStringPath));
+                            if (tagData != null)
+                            {
+                                node.RemoveChild(childNode1);
+                                streamWriter.WriteLineAsync($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
+                                tagData.Deleted = true;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                DeleteOnlyHMITags(childNode1, tagDataList, streamWriter, excludeStringPath);
+            }
+        }
+        private static void AddTemplatedTagsToXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -195,7 +231,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                EditXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
+                AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
         private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
@@ -382,17 +418,21 @@ namespace IgnitionHelper
             }
         }
 
-        public static Task CreateTemplateAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
+        public static Task CreateTemplatesAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
-            return Task.Run(() => CreateTemplate(node, output, streamWriter, folderName, path));
+            return Task.Run(() => CreateTemplates(node, output, streamWriter, folderName, path));
         }
-        public static Task SetPLCTagInHMIStatusAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
+        public static Task UpdateTagDataListWithXmlDataAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
         {
-            return Task.Run(() => SetPLCTagInHMIStatus(node, tagDataList, streamWriter, folderName, path));
+            return Task.Run(() => UpdateTagDataListWithXmlData(node, tagDataList, streamWriter, folderName, path));
         }
-        public static Task EditXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
+        public static Task DeleteOnlyHMITagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
         {
-            return Task.Run(() => EditXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
+            return Task.Run(() => DeleteOnlyHMITags(node, tagDataList, streamWriter, excludeStringPath));
+        }
+        public static Task AddTemplatedTagsToXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
+        {
+            return Task.Run(() => AddTemplatedTagsToXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
         }
         public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
         {
