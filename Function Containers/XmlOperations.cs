@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Serialization;
 using IgnitionHelper.Extensions;
@@ -128,14 +129,15 @@ namespace IgnitionHelper
         private static void AddOnlyHMITagToTagDataList(XmlNode node, XmlAttribute udtAttribute, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string? path)
         {
             var udtName = udtAttribute.Value;
-            foreach (XmlNode childNode2 in node.ChildNodes)
+
+            foreach (XmlNode childNode in node.ChildNodes)
             {
-                if (childNode2.Name == "Property" && childNode2.Attributes != null)
+                if (childNode.Name == "Property" && childNode.Attributes != null)
                 {
-                    XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
+                    XmlAttribute? xmlAttribute = childNode.Attributes["name"];
                     if (xmlAttribute != null && xmlAttribute.Value == "typeId")
                     {
-                        string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                        string dtVisuName = childNode.InnerText.Substring(childNode.InnerText.LastIndexOf(@"/") + 1, childNode.InnerText.Length - childNode.InnerText.LastIndexOf(@"/") - 1);
                         if (dtVisuName != null)
                         {
                             TagDataPLC newTag = new()
@@ -146,6 +148,7 @@ namespace IgnitionHelper
                                 VisuFolderName = folderName,
                                 VisuPath = path,
                                 DataTypeVisu = dtVisuName,
+                                DataTypePLC = string.Empty,
                             };
                             tagDataList.Add(newTag);
                             streamWriter.WriteLine($"Found Visu tag: {udtName} dataType: {dtVisuName} which is not in PLC!");
@@ -154,11 +157,14 @@ namespace IgnitionHelper
                 }
             }
         }
-        private static void DeleteOnlyHMITags(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
+        private static void DeleteNotCorrectTags(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
         {
-            foreach (XmlNode childNode1 in node.ChildNodes)
+            XmlNodeList childNodes = node.ChildNodes;
+            int i = 0;
+            while (i < childNodes.Count)
             {
-                if (childNode1.Name == "Tag" && childNode1.Attributes != null)
+                XmlNode? childNode1 = childNodes[i];
+                if (childNode1 != null && childNode1.Name == "Tag" && childNode1.Attributes != null)
                 {
                     XmlAttribute? xmlAttribute1 = childNode1.Attributes["type"];
                     XmlAttribute? xmlAttribute2 = childNode1.Attributes["name"];
@@ -168,21 +174,44 @@ namespace IgnitionHelper
                         {
                             //Search for HMI Only Tag
                             TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value
-                                                                           && item.DataTypePLC == string.Empty && item.DataTypeVisu != string.Empty
-                                                                           && !item.VisuPath.Contains(excludeStringPath));
+                                                                           && !item.IsCorrect && item.IsAdded
+                                                                           && !item.VisuPath.ContainsMany(excludeStringPath, StringComparison.OrdinalIgnoreCase));
                             if (tagData != null)
                             {
-                                node.RemoveChild(childNode1);
-                                streamWriter.WriteLineAsync($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
-                                tagData.Deleted = true;
+                                bool isDeleted = false;
+                                foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                                {
+                                    if (childNode2.Name == "Property" && childNode2.Attributes != null)
+                                    {
+                                        XmlAttribute? xmlAttribute = childNode2.Attributes["name"];
+                                        if (xmlAttribute != null && xmlAttribute.Value == "typeId")
+                                        {
+                                            string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
+                                            if (dtVisuName != null)
+                                            {
+                                                if(dtVisuName == tagData.DataTypeVisu)
+                                                {
+                                                    node.RemoveChild(childNode1);
+                                                    streamWriter.WriteLineAsync($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
+                                                    tagData.Deleted = true;
+                                                    isDeleted = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (isDeleted)
+                                    continue;
                             }
                         }
                     }
                 }
+                i++;
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                DeleteOnlyHMITags(childNode1, tagDataList, streamWriter, excludeStringPath);
+                DeleteNotCorrectTags(childNode1, tagDataList, streamWriter, excludeStringPath);
             }
         }
         private static void AddTemplatedTagsToXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
@@ -426,9 +455,9 @@ namespace IgnitionHelper
         {
             return Task.Run(() => UpdateTagDataListWithXmlData(node, tagDataList, streamWriter, folderName, path));
         }
-        public static Task DeleteOnlyHMITagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
+        public static Task DeleteNotCorrectTagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
         {
-            return Task.Run(() => DeleteOnlyHMITags(node, tagDataList, streamWriter, excludeStringPath));
+            return Task.Run(() => DeleteNotCorrectTags(node, tagDataList, streamWriter, excludeStringPath));
         }
         public static Task AddTemplatedTagsToXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
         {

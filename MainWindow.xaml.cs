@@ -109,8 +109,11 @@ namespace IgnitionHelper
                             TB_Status.AddLine($"\n Done checking! There was aleady {tagDataABList_g.Count(item => item.IsAdded)}/{tagDataABList_g.Count} instances ");
                             await XmlOperations.AddTemplatedTagsToXmlAsync(doc_g.DocumentElement, tagDataABList_g, tempInstList_g, textLogg_g, null, null);
                             TB_Status.AddLine($"\n Done editing! {tagDataABList_g.Count(item => item.IsAdded)}/{tagDataABList_g.Count} instances done");
-                            await XmlOperations.DeleteOnlyHMITagsAsync(doc_g.DocumentElement, tagDataABList_g, textLogg_g, "Safety");
-                            TB_Status.AddLine($"\n Deleted {tagDataABList_g.Count(item => item.Deleted)}/{tagDataABList_g.Count(item => item.DataTypePLC == string.Empty && item.DataTypeVisu != string.Empty )} nodes!");
+
+                            //TODO: Move this function to different event (button click) and add textblock to fill exclude string with
+                            await XmlOperations.DeleteNotCorrectTagsAsync(doc_g.DocumentElement, tagDataABList_g, textLogg_g, "Safety;Hanger");
+
+                            TB_Status.AddLine($"\n Deleted {tagDataABList_g.Count(item => item.Deleted)}/{tagDataABList_g.Count(item => item.IsAdded && !item.IsCorrect)} nodes!");
                             string newName = expFolderPath_g + @"\" + xmlFile_g.Name.Replace(".xml", "_edit.xml");
                             TB_Status.AddLine($"\n Found instances Added in XML and NOT CORRECT: {tagDataABList_g.Count(item => item.IsAdded && !item.IsCorrect)}");
                             doc_g.Save($"{newName}");
