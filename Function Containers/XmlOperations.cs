@@ -157,7 +157,7 @@ namespace IgnitionHelper
                 }
             }
         }
-        private static void DeleteNotCorrectTags(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
+        private static void DeleteSelectedTags(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter)
         {
             XmlNodeList childNodes = node.ChildNodes;
             int i = 0;
@@ -172,10 +172,8 @@ namespace IgnitionHelper
                     {
                         if (xmlAttribute1.Value == "UdtInstance")
                         {
-                            //Search for HMI Only Tag
-                            TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value
-                                                                           && !item.IsCorrect && item.IsAdded
-                                                                           && !item.VisuPath.ContainsMany(excludeStringPath, StringComparison.OrdinalIgnoreCase));
+                            //Search for tags marked to Delete
+                            TagDataPLC? tagData = tagDataList.Find(item => item.Name == xmlAttribute2.Value && item.ToDelete && !item.Deleted);
                             if (tagData != null)
                             {
                                 bool isDeleted = false;
@@ -192,7 +190,7 @@ namespace IgnitionHelper
                                                 if(dtVisuName == tagData.DataTypeVisu)
                                                 {
                                                     node.RemoveChild(childNode1);
-                                                    streamWriter.WriteLineAsync($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
+                                                    streamWriter.WriteLine($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
                                                     tagData.Deleted = true;
                                                     isDeleted = true;
                                                     break;
@@ -211,7 +209,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                DeleteNotCorrectTags(childNode1, tagDataList, streamWriter, excludeStringPath);
+                DeleteSelectedTags(childNode1, tagDataList, streamWriter);
             }
         }
         private static void AddTemplatedTagsToXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
@@ -290,7 +288,7 @@ namespace IgnitionHelper
                                             groupPropFound = true;
                                             editData.GroupPropChange++;
                                             childNode2.InnerText = value;
-                                            streamWriter.WriteLineAsync($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                            streamWriter.WriteLine($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                         }
                                     }
                                 }
@@ -320,7 +318,7 @@ namespace IgnitionHelper
                                                             tagPropFound = true;
                                                             editData.TagPropChanged++;
                                                             childNode4.InnerText = value;
-                                                            streamWriter.WriteLineAsync($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                            streamWriter.WriteLine($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                                         }
                                                     }
                                                 }
@@ -335,7 +333,7 @@ namespace IgnitionHelper
                                                 newNode.InnerText = value;
                                                 editData.TagPropAdded++;
                                                 childNode3.InsertAfter(newNode, childNode3.LastChild);
-                                                streamWriter.WriteLineAsync($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                streamWriter.WriteLine($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                                             }
                                         }
                                     }
@@ -351,7 +349,7 @@ namespace IgnitionHelper
                                 newNode.InnerText = value;
                                 editData.GroupPropAdded++;
                                 childNode1.InsertAfter(newNode, childNode1.LastChild);
-                                streamWriter.WriteLineAsync($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                streamWriter.WriteLine($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
                             }
                         }
                     }
@@ -455,9 +453,9 @@ namespace IgnitionHelper
         {
             return Task.Run(() => UpdateTagDataListWithXmlData(node, tagDataList, streamWriter, folderName, path));
         }
-        public static Task DeleteNotCorrectTagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string excludeStringPath)
+        public static Task DeleteSelectedTagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter)
         {
-            return Task.Run(() => DeleteNotCorrectTags(node, tagDataList, streamWriter, excludeStringPath));
+            return Task.Run(() => DeleteSelectedTags(node, tagDataList, streamWriter));
         }
         public static Task AddTemplatedTagsToXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
         {

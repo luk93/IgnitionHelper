@@ -15,6 +15,7 @@ namespace IgnitionHelper
         public bool IsAdded { get; set; }
         public bool IsCorrect { get; set; }
         public bool Deleted { get; set; }
+        public bool ToDelete { get; set; }
         public string VisuFolderName { get; set; }
         public string? VisuPath { get; set; }
         public TagDataPLC()
@@ -27,6 +28,7 @@ namespace IgnitionHelper
             VisuFolderName = string.Empty;
             VisuPath = string.Empty;
             Deleted = false;
+            ToDelete = false;
         }
         public TagDataPLC(string name, string dataTypePLC, string dataTypeVisu)
         {
@@ -38,6 +40,7 @@ namespace IgnitionHelper
             VisuFolderName = string.Empty;
             VisuPath = string.Empty;
             Deleted = false;
+            ToDelete = false;
         }
     }
 }

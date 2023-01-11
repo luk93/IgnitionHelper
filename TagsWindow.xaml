@@ -1,0 +1,84 @@
+﻿<Window x:Class="IgnitionHelper.TagsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tools="clr-namespace:IgnitionHelper.UI_Tools"
+        xmlns:local="clr-namespace:IgnitionHelper"
+        mc:Ignorable="d"
+        Title="TagsWindow" Height="450" Width="900" MinWidth="900" MinHeight="450"
+        Background="#546A76"
+        Foreground="#F5E9E2">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Select Tags to Delete" Margin="5,0,5,0" Grid.Row="0" Grid.ColumnSpan="2" Width="Auto" Height="Auto" Foreground="#F5E9E2" />
+        <ListView x:Name ="LV_TagData"  Margin="5,0,5,5" Grid.Row="1" Grid.ColumnSpan="2" Width="Auto" Height="Auto" Foreground="#FF010111">
+            <ListView.Background>
+                <SolidColorBrush Color="AliceBlue"/>
+            </ListView.Background>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn tools:GridColumn.MinWidth="160" Width="160" Header="Name" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="160" Width="160"  Header="Data Type Visu">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataTypeVisu}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="160" Width="160"  Header="Data Type PLC">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataTypePLC}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="100" Width="100"  Header="Folder">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding VisuFolderName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="60" Width="60"  Header="Correct">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="5, 0" IsEnabled="False" IsChecked="{Binding IsCorrect, Mode=OneWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="60" Width="60"  Header="To Delete">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="5, 0" IsChecked="{Binding ToDelete, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn tools:GridColumn.MinWidth="60" Width="60"  Header="Deleted">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="5, 0" IsEnabled="False" IsChecked="{Binding Deleted, Mode=OneWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="B_ApplyChanges" Content="APPLY" Margin="150,0,15,5" Grid.Row="2" Grid.Column="0" Width="150" Height="25" Click="B_ApplyChanges_Click" />
+        <Button x:Name="B_CancelChanges" Content="CANCEL" Margin="15,0,150,5" Grid.Row="2" Grid.Column="1" Width="150" Height="25" Click="B_CancelChanges_Click"/>
+    </Grid>
+</Window>
