@@ -273,7 +273,14 @@ namespace IgnitionHelper
             {
                 L_SelectedJsonToEditPath.Text = jsonFile.FullName;
                 TB_Status.AddLine($"\n Selected json file to Edit : {jsonFile.FullName}");
-                json = JObject.Parse(System.IO.File.ReadAllText(jsonFile.FullName));
+                try
+                {
+                    json = JObject.Parse(System.IO.File.ReadAllText(jsonFile.FullName));
+                }
+                catch(Exception ex) 
+                {
+                    TB_Status.AddLine($"{ex.Message}");
+                }
 
                 if (jsonFile != null)
                 {
