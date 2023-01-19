@@ -351,6 +351,11 @@ namespace IgnitionHelper
             TB_Status.AddLine("Fill TextBox 'Strings included in Data Type name'!");
             B_SelectTagsXLSX.IsEnabled = false;
         }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            textLogg.Close();
+        }
         #endregion
         #region UI Functions
         public void DisableButtonAndChangeCursor(object sender)

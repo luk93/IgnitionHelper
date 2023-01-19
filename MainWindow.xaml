@@ -86,6 +86,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
+                    <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Select Tags to delete from .xml file" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
                     <Button x:Name ="B_GenExcelTagData" Grid.Row="4" Grid.Column="0" Content="Generate TagData (.xlsx)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenExcelTagData_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
