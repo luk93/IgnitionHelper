@@ -67,23 +67,24 @@ namespace IgnitionHelper
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
+            var includedDTName = TB_FilterTextUdt.Text;
             tagsFile = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
             if (tagsFile != null)
             {
                 L_PLCTagsFilePath.Text = tagsFile.FullName;
-                TB_Status.AddLine($"\n Selected: {tagsFile.FullName}");
+                TB_Status.AddLine($"Selected: {tagsFile.FullName}");
                 try
                 {
                     if (TagDataList.Count >= 0)
                         TagDataList.Clear();
-                    TagDataList = await ExcelOperations.LoadTagDataListFromExcelFile(tagsFile);
-                    TB_Status.AddLine($"\n Acquired {TagDataList.Count} tags");
+                    TagDataList = await ExcelOperations.LoadTagDataListFromExcelFile(tagsFile, includedDTName);
+                    TB_Status.AddLine($"Acquired {TagDataList.Count} tags");
                     B_GenerateXml.IsEnabled = true;
                 }
                 catch (Exception ex)
                 {
-                    TB_Status.AddLine($"\n{ex.Message}");
-                    TB_Status.AddLine($"\n{ex.StackTrace}");
+                    TB_Status.AddLine($"{ex.Message}");
+                    TB_Status.AddLine($"{ex.StackTrace}");
                 }
             }
             EnableButtonAndChangeCursor(sender);
@@ -103,26 +104,26 @@ namespace IgnitionHelper
                         if (tempInstList.Count >= 0)
                             tempInstList.Clear();
                         await XmlOperations.CreateTemplatesAsync(doc.DocumentElement, tempInstList, textLogg, null, null);
-                        TB_Status.AddLine($"\n Number of template nodes got: {tempInstList.Count}");
+                        TB_Status.AddLine($"Number of template nodes got: {tempInstList.Count}");
                     }
                     catch (Exception ex)
                     {
-                        TB_Status.AddLine($"\n {ex.Message}");
-                        TB_Status.AddLine($"\n {ex.StackTrace}");
+                        TB_Status.AddLine($"{ex.Message}");
+                        TB_Status.AddLine($"{ex.StackTrace}");
                     }
                     if (tempInstList.Count > 0)
                     {
                         try
                         {
                             await XmlOperations.UpdateTagDataListWithXmlDataAsync(doc.DocumentElement, TagDataList, textLogg, null, null);
-                            TB_Status.AddLine($"\n Done checking! There was aleady {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances ");
+                            TB_Status.AddLine($"Done checking! There was aleady {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances ");
                             await XmlOperations.AddTemplatedTagsToXmlAsync(doc.DocumentElement, TagDataList, tempInstList, textLogg, null, null);
-                            TB_Status.AddLine($"\n Done editing! {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances done");
+                            TB_Status.AddLine($"Done editing! {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances done");
                             string newName = expFolderPath + @"\" + xmlFile.Name.Replace(".xml", "_edit.xml");
-                            TB_Status.AddLine($"\n Found instances Added in XML and NOT CORRECT: {TagDataList.Count(item => item.IsAdded && !item.IsCorrect)}");
+                            TB_Status.AddLine($"Found instances Added in XML and NOT CORRECT: {TagDataList.Count(item => item.IsAdded && !item.IsCorrect)}");
                             doc.Save($"{newName}");
                             TagDataList.GetFoldersInfo(TB_Status);
-                            TB_Status.AddLine($"\n Saved file: {newName}");
+                            TB_Status.AddLine($"Saved file: {newName}");
                             foreach (var item in TagDataList)
                             {
                                 textLogg.WriteLine($"name:{item.Name};dataTypePLC:{item.DataTypePLC};dataTypeVisu:{item.DataTypeVisu};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
@@ -132,8 +133,8 @@ namespace IgnitionHelper
                         }
                         catch (Exception ex)
                         {
-                            TB_Status.AddLine($"\n {ex.Message}");
-                            TB_Status.AddLine($"\n {ex.StackTrace}");
+                            TB_Status.AddLine($"{ex.Message}");
+                            TB_Status.AddLine($"{ex.StackTrace}");
                         }
                     }
                 }
@@ -147,14 +148,14 @@ namespace IgnitionHelper
             var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg);
             if (excelPackage == null)
             {
-                TB_Status.AddLine("\n Failed to create (.xlsx) file!");
+                TB_Status.AddLine($"Failed to create (.xlsx) file!");
                 return;
             }
             var ws = excelPackage.Workbook.Worksheets.Add("Tag Data List");
             var range = ws.Cells["A1"].LoadFromCollection(TagDataList, true);
             range.AutoFitColumns();
             await ExcelOperations.SaveExcelFile(excelPackage);
-            TB_Status.AddLine($"\n Created file : {filePath}");
+            TB_Status.AddLine($"Created file : {filePath}");
             EnableButtonAndChangeCursor(sender);
         }
         private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
@@ -166,19 +167,19 @@ namespace IgnitionHelper
                 {
                     AlarmEditData editData = new();
                     await XmlOperations.EditUdtAlarmsXmlAsync(doc, doc.DocumentElement, editData);
-                    TB_Status.AddLine($"\n Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
+                    TB_Status.AddLine($"Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
                     string newName = expFolderPath + @"\" + xmlFile.Name;
-                    TB_Status.AddLine($"\n Saved edited file in: {newName}");
+                    TB_Status.AddLine($"Saved edited file in: {newName}");
                     doc.Save($"{newName}");
                 }
                 catch (Exception ex)
                 {
-                    TB_Status.AddLine($"\n {ex.Message}");
-                    TB_Status.AddLine($"\n {ex.StackTrace}");
+                    TB_Status.AddLine($"{ex.Message}");
+                    TB_Status.AddLine($"{ex.StackTrace}");
                 }
             }
             else
-                TB_Status.AddLine($"\n Xml File is not correct!");
+                TB_Status.AddLine($"Xml File is not correct!");
             EnableButtonAndChangeCursor(sender);
         }
         private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
@@ -189,7 +190,7 @@ namespace IgnitionHelper
             string value = TB_EditValue.Text;
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
             {
-                TB_Status.AddLine("\n Fill all labels!");
+                TB_Status.AddLine($"Fill all labels!");
                 return;
             }
             if (doc.DocumentElement != null && xmlFile != null)
@@ -199,19 +200,19 @@ namespace IgnitionHelper
                     TagPropertyEditData editData = new();
                     textLogg.WriteLine($"Started editing {xmlFile.Name}");
                     await XmlOperations.EditUdtPropertiesXmlAync(doc, doc.DocumentElement, editData, textLogg, tagGroup, valueToEdit, value);
-                    TB_Status.AddLine($"\n Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
+                    TB_Status.AddLine($"Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
                     string newName = expFolderPath + @"\" + xmlFile.Name;
-                    TB_Status.AddLine($"\n Saved edited file in: {newName}");
+                    TB_Status.AddLine($"Saved edited file in: {newName}");
                     doc.Save($"{newName}");
                 }
                 catch (Exception ex)
                 {
-                    TB_Status.AddLine($"\n {ex.Message}");
-                    TB_Status.AddLine($"\n {ex.StackTrace}");
+                    TB_Status.AddLine($"{ex.Message}");
+                    TB_Status.AddLine($"{ex.StackTrace}");
                 }
             }
             else
-                TB_Status.AddLine($"\n Xml File is not correct!");
+                TB_Status.AddLine($"Xml File is not correct!");
             EnableButtonAndChangeCursor(sender);
         }
         private void B_SelectExpFolder_Click(object sender, RoutedEventArgs e)
@@ -236,7 +237,7 @@ namespace IgnitionHelper
             }
             catch (Exception ex)
             {
-                TB_Status.AddLine($"\n {ex.Message}");
+                TB_Status.AddLine($"{ex.Message}");
                 TB_Status.AddLine(ex.StackTrace != null ? $"\n {ex.StackTrace}" : "");
             }
         }
@@ -252,7 +253,7 @@ namespace IgnitionHelper
             if (xmlFile != null)
             {
                 L_SelectedFileToEditPath.Text = xmlFile.FullName;
-                TB_Status.AddLine($"\n Selected xml file to Edit : {xmlFile.FullName}");
+                TB_Status.AddLine($"Selected xml file to Edit : {xmlFile.FullName}");
                 doc.Load(xmlFile.FullName);
                 if (doc.DocumentElement != null)
                 {
@@ -272,7 +273,7 @@ namespace IgnitionHelper
             if (jsonFile != null)
             {
                 L_SelectedJsonToEditPath.Text = jsonFile.FullName;
-                TB_Status.AddLine($"\n Selected json file to Edit : {jsonFile.FullName}");
+                TB_Status.AddLine($"Selected json file to Edit : {jsonFile.FullName}");
                 try
                 {
                     json = JObject.Parse(System.IO.File.ReadAllText(jsonFile.FullName));
@@ -298,12 +299,12 @@ namespace IgnitionHelper
                 string propertyToEdit = TB_JsonPropertyToMultiply.Text;
                 if (propertyToEdit == string.Empty)
                 {
-                    TB_Status.AddLine("\nProperty to edit is empty! Enter property name to edit");
+                    TB_Status.AddLine("Property to edit is empty! Enter property name to edit");
                     return;
                 }
                 if (TB_JsonIndexToMultiply.Text == string.Empty || !int.TryParse(TB_JsonIndexToMultiply.Text, out arrayIndexToFind) || arrayIndexToFind <= -1)
                 {
-                    TB_Status.AddLine("\nIndex is not correct! Must be a number and greater or equal 0!");
+                    TB_Status.AddLine("Index is not correct! Must be a number and greater or equal 0!");
                     return;
                 }
                 var result = JsonOperations.MultiplyProperties(json, jsonFile, expFolderPath, propertyToEdit, arrayIndexToFind, textLogg);
@@ -318,12 +319,12 @@ namespace IgnitionHelper
                 string nodeNameToMultiply = TB_NodeNameToMultiply.Text;
                 if (propertyToEdit == string.Empty)
                 {
-                    TB_Status.AddLine("\nProperty to edit is empty! Enter property name to edit");
+                    TB_Status.AddLine("Property to edit is empty! Enter property name to edit");
                     return;
                 }
                 if (nodeNameToMultiply == "nodeNameToMultiply")
                 {
-                    TB_Status.AddLine("\nEdit Node name to multiply!");
+                    TB_Status.AddLine("Edit Node name to multiply!");
                     return;
                 }
                 var result = JsonOperations.MultiplyTag(json, jsonFile, expFolderPath, propertyToEdit, nodeNameToMultiply, textLogg);
@@ -334,6 +335,21 @@ namespace IgnitionHelper
         {
             TagsWindow tagsWindow = new TagsWindow(this);
             tagsWindow.Show();
+        }
+        private void TB_FilterTextUdt_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //Init bypass
+            if (B_SelectTagsXLSX == null)
+                return;
+
+            TextBox tb = (TextBox)sender;
+            if (tb.Text != string.Empty)
+            {
+                B_SelectTagsXLSX.IsEnabled = true;
+                return;
+            }
+            TB_Status.AddLine("Fill TextBox 'Strings included in Data Type name'!");
+            B_SelectTagsXLSX.IsEnabled = false;
         }
         #endregion
         #region UI Functions
@@ -404,12 +420,12 @@ namespace IgnitionHelper
                 {
                     return xmlFile;
                 }
-                TB_Status.AddLine("\n File not exist or in use!");
+                TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
             else
             {
-                TB_Status.AddLine("\n File not selected!");
+                TB_Status.AddLine($"File not selected!");
                 return null;
             }
         }
@@ -434,12 +450,12 @@ namespace IgnitionHelper
                 {
                     return xmlFile;
                 }
-                TB_Status.AddLine("\n File not exist or in use!");
+                TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
             else
             {
-                TB_Status.AddLine("\n File not selected!");
+                TB_Status.AddLine($"File not selected!");
                 return null;
             }
         }
@@ -464,12 +480,12 @@ namespace IgnitionHelper
                 {
                     return xmlFile;
                 }
-                TB_Status.AddLine("\n File not exist or in use!");
+                TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
             else
             {
-                TB_Status.AddLine("\n File not selected!");
+                TB_Status.AddLine($"File not selected!");
                 return null;
             }
         }
@@ -486,18 +502,19 @@ namespace IgnitionHelper
             try
             {
                 await XmlOperations.DeleteSelectedTagsAsync(doc.DocumentElement, TagDataList, textLogg);
-                TB_Status.AddLine($"\n Deleted {TagDataList.Count(item => item.Deleted)}/{TagDataList.Count(item => item.ToDelete)} tags(nodes)!");
+                TB_Status.AddLine($"Deleted {TagDataList.Count(item => item.Deleted)}/{TagDataList.Count(item => item.ToDelete)} tags(nodes)!");
                 string newName = expFolderPath + @"\" + xmlFile.Name.Replace(".xml", "_edit.xml");
                 doc.Save($"{newName}");
-                TB_Status.AddLine($"\n Saved file: {newName}");
+                TB_Status.AddLine($"Saved file: {newName}");
             }
             catch( Exception ex ) 
             {
-                TB_Status.AddLine($"\n {ex.Message}");
-                TB_Status.AddLine($"\n {ex.StackTrace}");
+                TB_Status.AddLine($"{ex.Message}");
+                TB_Status.AddLine($"{ex.StackTrace}");
             }
             Cursor = Cursors.Arrow;
         }
+
     }
     #endregion
 }

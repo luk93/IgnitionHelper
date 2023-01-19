@@ -89,7 +89,7 @@ namespace IgnitionHelper
                                                 if (dtVisuName != null)
                                                 {
                                                     //string tolerance is both side:
-                                                    if ((StringExt.Contains(dtVisuName, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
+                                                    if ((dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
@@ -235,8 +235,8 @@ namespace IgnitionHelper
                                     if (!tagData.IsAdded)
                                     {
                                         //tolerance in names extended
-                                        TempInstanceVisu? tempInst = tempInstList.Find(item => (StringExt.Contains(item.Name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
-                                                                                            StringExt.Contains(tagData.DataTypePLC, item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
+                                        TempInstanceVisu? tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
+                                                                                            tagData.DataTypePLC.Contains(item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
                                         if (tempInst != null)
                                         {
                                             XmlNode? newNode = tempInst.Node.CloneNode(true);

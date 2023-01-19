@@ -19,7 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="64*"/>
             <RowDefinition Height="63*"/>
-            <RowDefinition Height="94*"/>
+            <RowDefinition Height="120*"/>
             <RowDefinition Height="226*"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
@@ -58,8 +58,11 @@
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="20*"/>
+                        <RowDefinition Height="20*"/>
                     </Grid.RowDefinitions>
-                    <Button x:Name ="B_SelectTagsXLSX" Grid.Row="0" Grid.Column="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_ClickAsync" Height="20" IsEnabled="False">
+                    <TextBox x:Name="TB_FilterTextUdt" Grid.Row="0" Grid.Column="0" Text="ud_;AB:PowerFlex" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" TextChanged="TB_FilterTextUdt_TextChanged"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Strings included in Data Type name" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
+                    <Button x:Name ="B_SelectTagsXLSX" Grid.Row="1" Grid.Column="0" Content="Select Exp Tags (.XLSX)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Click="B_SelectTagsXLSX_ClickAsync" Height="20" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -67,7 +70,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <Button x:Name ="B_GenerateXml" Grid.Row="1" Grid.Column="0" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenerateXml_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
+                    <Button x:Name ="B_GenerateXml" Grid.Row="2" Grid.Column="0" Content="Generate XML" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenerateXml_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -75,7 +78,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <Button x:Name ="B_ShowTagsWindow" Grid.Row="2" Grid.Column="0" Content="Modify Tags" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_ShowTagsWindow_Click" Margin="5,5,0,0" IsEnabled="False">
+                    <Button x:Name ="B_ShowTagsWindow" Grid.Row="3" Grid.Column="0" Content="Modify Tags" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_ShowTagsWindow_Click" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -83,7 +86,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <Button x:Name ="B_GenExcelTagData" Grid.Row="3" Grid.Column="0" Content="Generate TagData (.xlsx)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenExcelTagData_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
+                    <Button x:Name ="B_GenExcelTagData" Grid.Row="4" Grid.Column="0" Content="Generate TagData (.xlsx)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Height="20" Click="B_GenExcelTagData_ClickAsync" Margin="5,5,0,0" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -91,8 +94,8 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <TextBlock x:Name="L_PLCTagsFilePath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Tags from PLC file (.xlsx) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
-                    <TextBlock x:Name="L_HMITagsFilePath" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Tags from Ignition file (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Margin="0,5,0,0" Grid.ColumnSpan="3"/>
+                    <TextBlock x:Name="L_PLCTagsFilePath" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Tags from PLC file (.xlsx) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
+                    <TextBlock x:Name="L_HMITagsFilePath" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Tags from Ignition file (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Margin="0,5,0,0" Grid.ColumnSpan="3"/>
                 </Grid>
             </TabItem>
             <!--DataTypeDefinition Tab-->
@@ -151,10 +154,11 @@
                 </TabItem.Background>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="14*"/>
+                        <ColumnDefinition Width="83*"/>
+                        <ColumnDefinition Width="97*"/>
+                        <ColumnDefinition Width="97*"/>
+                        <ColumnDefinition Width="97*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20*"/>
@@ -169,7 +173,7 @@
                             <GradientStop Color="#8aa2a9" Offset="0.493"/>
                         </LinearGradientBrush>
                     </Grid.Background>
-                    <Button x:Name ="B_SelectFileToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectFileToEdit_Click" IsEnabled="True">
+                    <Button x:Name ="B_SelectFileToEdit" Grid.Column="0" Grid.Row="0" Content="Select File To Edit (.xml)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectFileToEdit_Click" IsEnabled="True" Grid.ColumnSpan="2">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -177,14 +181,14 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <TextBlock x:Name="L_SelectedFileToEditPath" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
-                    <Label Content="Tag Group" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_TagGroup" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="CB" VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Label Content="Value To Edit" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_ValueToEdit" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup"  VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Label Content="Edit Value" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
-                    <TextBox x:Name="TB_EditValue" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup_CB" VerticalAlignment="Top" Width="140" Height="20"/>
-                    <Button x:Name ="B_EditTagUdt" Grid.Column="3" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdt_ClickAsync" IsEnabled="False">
+                    <TextBlock x:Name="L_SelectedFileToEditPath" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Udt/Tags from PLC Ignition (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="2"/>
+                    <Label Content="Tag Group" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" Grid.ColumnSpan="2" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_TagGroup" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="CB" VerticalAlignment="Top" Width="140" Height="20" Grid.ColumnSpan="2"/>
+                    <Label Content="Value To Edit" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_ValueToEdit" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="tagGroup"  VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Label Content="Edit Value" Grid.Column="3" Grid.Row="1" HorizontalAlignment="Left" Margin="4,0,0,0" VerticalAlignment="Center" Height="Auto" Width="Auto"/>
+                    <TextBox x:Name="TB_EditValue" Grid.Column="3" Grid.Row="2" HorizontalAlignment="Left" Margin="4,5,0,0" TextWrapping="Wrap" Text="tagGroup_CB" VerticalAlignment="Top" Width="140" Height="20"/>
+                    <Button x:Name ="B_EditTagUdt" Grid.Column="4" Grid.Row="2" Content="Edit" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditTagUdt_ClickAsync" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>
@@ -192,7 +196,7 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
-                    <Button x:Name ="B_EditAlarmUdt" Grid.Column="3" Grid.Row="3" Content="Edit Alarms" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditAlarmUdt_ClickAsync" IsEnabled="False">
+                    <Button x:Name ="B_EditAlarmUdt" Grid.Column="4" Grid.Row="3" Content="Edit Alarms" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_EditAlarmUdt_ClickAsync" IsEnabled="False">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>

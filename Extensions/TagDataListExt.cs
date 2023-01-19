@@ -19,7 +19,7 @@ namespace IgnitionHelper.Extensions
             foreach (string folderName in folderNames)
             {
                 var folderCount = tagDataList.Count(tagData => tagData.VisuFolderName == folderName && tagData.IsAdded);
-                textBlock.AddLine($"\n Folder name: {folderName} count: {folderCount}");
+                textBlock.AddLine($"Folder name: {folderName} count: {folderCount}");
             }
         }
         public static void GetDataFromObservableCollection(this List<TagDataPLC> tagDataList, ObservableCollection<TagDataPLC> tagDataObsCol)

@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using IgnitionHelper.Extensions;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ namespace IgnitionHelper
 {
     public static class ExcelOperations
     {
-        public static async Task<List<TagDataPLC>> LoadTagDataListFromExcelFile(FileInfo file)
+        public static async Task<List<TagDataPLC>> LoadTagDataListFromExcelFile(FileInfo file, string inludedDTname)
         {
             List<TagDataPLC> output = new List<TagDataPLC>();
             var package = new ExcelPackage(file);
@@ -26,7 +27,7 @@ namespace IgnitionHelper
                     {
                         if (!string.IsNullOrWhiteSpace(ws.Cells[row, col + 4].Value?.ToString()))
                         {
-                            if (ws.Cells[row, col + 4].Value.ToString().Contains("ud_"))
+                            if (ws.Cells[row, col + 4].Value.ToString().ContainsMany(inludedDTname, StringComparison.OrdinalIgnoreCase))
                             {
                                 TagDataPLC newObj = new TagDataPLC();
                                 newObj.DataTypePLC = (ws.Cells[row, col + 4].Value.ToString());
