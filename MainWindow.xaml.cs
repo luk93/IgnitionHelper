@@ -224,7 +224,7 @@ namespace IgnitionHelper
             var result = openFolderDialog.ShowDialog();
             if (result == true)
             {
-                expFolderPath = openFolderDialog.SelectedPath + @"\";
+                expFolderPath = openFolderDialog.SelectedPath;
                 TB_ExpFolderPath.Text = expFolderPath;
                 EB_ExpFolderSelected();
             }
@@ -278,7 +278,7 @@ namespace IgnitionHelper
                 {
                     json = JObject.Parse(System.IO.File.ReadAllText(jsonFile.FullName));
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 {
                     TB_Status.AddLine($"{ex.Message}");
                 }
@@ -385,22 +385,20 @@ namespace IgnitionHelper
                 tb.Text = expFolderPath;
                 toReturn = expFolderPath;
                 EB_ExpFolderSelected();
+                return toReturn;
             }
-            else
+            var openFolderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
             {
-                var openFolderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
-                {
-                    openFolderDialog.Description = "Select export Directory:";
-                };
-                var result = openFolderDialog.ShowDialog();
-                if (result == true)
-                {
-                    expFolderPath = openFolderDialog.SelectedPath + @"\";
-                    expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
-                    toReturn = expFolderPath;
-                    tb.Text = expFolderPath;
-                    EB_ExpFolderSelected();
-                }
+                openFolderDialog.Description = "Select export Directory:";
+            };
+            var result = openFolderDialog.ShowDialog();
+            if (result == true)
+            {
+                expFolderPath = openFolderDialog.SelectedPath;
+                expFolderPath = Tools.OverridePathWithDateTimeSubfolder(expFolderPath);
+                toReturn = expFolderPath;
+                tb.Text = expFolderPath;
+                EB_ExpFolderSelected();
             }
             return toReturn;
         }
@@ -512,7 +510,7 @@ namespace IgnitionHelper
                 doc.Save($"{newName}");
                 TB_Status.AddLine($"Saved file: {newName}");
             }
-            catch( Exception ex ) 
+            catch (Exception ex)
             {
                 TB_Status.AddLine($"{ex.Message}");
                 TB_Status.AddLine($"{ex.StackTrace}");
