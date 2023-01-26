@@ -426,11 +426,8 @@ namespace IgnitionHelper
                 TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
-            else
-            {
-                TB_Status.AddLine($"File not selected!");
-                return null;
-            }
+            TB_Status.AddLine($"File not selected!");
+            return null;
         }
         public FileInfo? SelectJsonFileAndTryToUse(string title)
         {
@@ -456,11 +453,8 @@ namespace IgnitionHelper
                 TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
-            else
-            {
-                TB_Status.AddLine($"File not selected!");
-                return null;
-            }
+            TB_Status.AddLine($"File not selected!");
+            return null;
         }
         public FileInfo? SelectXlsxFileAndTryToUse(string title)
         {
@@ -486,11 +480,8 @@ namespace IgnitionHelper
                 TB_Status.AddLine($"File not exist or in use!");
                 return null;
             }
-            else
-            {
-                TB_Status.AddLine($"File not selected!");
-                return null;
-            }
+            TB_Status.AddLine($"File not selected!");
+            return null;
         }
         #endregion
         #region Externally Called Functions
