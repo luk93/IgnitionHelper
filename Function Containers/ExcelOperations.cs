@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IgnitionHelper.Data_Containers;
 
 namespace IgnitionHelper
 {
@@ -29,7 +30,8 @@ namespace IgnitionHelper
                         {
                             if (ws.Cells[row, col + 4].Value.ToString().ContainsMany(inludedDTname, StringComparison.OrdinalIgnoreCase))
                             {
-                                TagDataPLC newObj = new TagDataPLC();
+                                var currentId = output.Count;
+                                TagDataPLC newObj = new TagDataPLC(currentId);
                                 newObj.DataTypePLC = (ws.Cells[row, col + 4].Value.ToString());
                                 newObj.Name = (ws.Cells[row, col + 2].Value.ToString());
                                 output.Add(newObj);

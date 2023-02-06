@@ -7,7 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-    
+using IgnitionHelper.Data_Containers;
+
 namespace IgnitionHelper.Extensions
 {
     static class TagDataListExt
@@ -26,7 +27,7 @@ namespace IgnitionHelper.Extensions
         {
             foreach(TagDataPLC tagData in tagDataObsCol) 
             {
-                var tag = tagDataList.FirstOrDefault(x => x.Name == tagData.Name);
+                var tag = tagDataList.FirstOrDefault(x => x.Id == tagData.Id);
                 if(tag != null)
                     tag.ToDelete = tagData.ToDelete;
             }

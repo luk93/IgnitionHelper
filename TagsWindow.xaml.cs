@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using IgnitionHelper.Data_Containers;
 
 namespace IgnitionHelper
 {
@@ -21,15 +22,16 @@ namespace IgnitionHelper
     /// </summary>
     public partial class TagsWindow : Window
     {
-        private static ObservableCollection<TagDataPLC>? _tagDataObsCol = null;
-        private static List<TagDataPLC>? _tagDataShorten = null;
-        private MainWindow _mainWindow;
+        private static ObservableCollection<TagDataPLC>? _tagDataObsCol;
+        private static List<TagDataPLC>? _tagDataShorten;
+        private readonly MainWindow _mainWindow;
         public TagsWindow(MainWindow mainWindow)
         {
             InitializeComponent();
-            _mainWindow = mainWindow;            
+            _mainWindow = mainWindow;
             _tagDataShorten = _mainWindow.TagDataList.Where(t => !t.IsCorrect && t.DataTypeVisu != string.Empty).ToList().DeepCopy();
-            _tagDataObsCol = new ObservableCollection<TagDataPLC>(_tagDataShorten); 
+            if (_tagDataShorten != null) 
+                _tagDataObsCol = new ObservableCollection<TagDataPLC>(_tagDataShorten);
             LV_TagData.ItemsSource = _tagDataObsCol;
         }
         private void B_ApplyChanges_Click(object sender, RoutedEventArgs e)

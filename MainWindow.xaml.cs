@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
+using IgnitionHelper.Data_Containers;
 using IgnitionHelper.Extensions;
 using IgnitionHelper.Function_Containers;
 using Microsoft.Win32;
@@ -33,16 +34,16 @@ namespace IgnitionHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        public FileInfo? tagsFile = null!;
-        public FileInfo? xmlFile = null!;
-        public FileInfo? jsonFile = null!;
-        public XmlDocument doc;
-        public JObject? json;
+        public FileInfo? TagsFile;
+        public FileInfo? XmlFile;
+        public FileInfo? JsonFile;
+        public XmlDocument XmlDoc;
+        public JObject? Json;
 
-        public static StreamWriter textLogg = null!;
-        public static List<TempInstanceVisu> tempInstList = null!;
-        public static int PB_Progress;
-        public static string expFolderPath = @"C:\Users\plradlig\Desktop\Lucid\Ignition\ExportFiles\App_Exp_files";
+        public static StreamWriter TextLogg = null!;
+        public static List<TempInstanceVisu> TempInstList = null!;
+        public static int PbProgress;
+        public static string ExpFolderPath = @"C:\Users\plradlig\Desktop\Lucid\Ignition\ExportFiles\App_Exp_files";
 
         public List<TagDataPLC> TagDataList { get; set; }
         public Func<Task> DeleteTagsFunc { get; set; }
@@ -54,30 +55,28 @@ namespace IgnitionHelper
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             TagDataList = new List<TagDataPLC>();
-            tempInstList = new List<TempInstanceVisu>();
-            doc = new();
-            json = null;
-            expFolderPath = CheckExportFolderPath(expFolderPath, TB_ExpFolderPath);
-            textLogg = new StreamWriter(@$"{expFolderPath}\textLogg.txt");
-
-            DeleteTagsFunc = new Func<Task>(DeleteTagsAsync);
-
+            TempInstList = new List<TempInstanceVisu>();
+            XmlDoc = new();
+            Json = null;
+            ExpFolderPath = CheckExportFolderPath(ExpFolderPath, TB_ExpFolderPath);
+            TextLogg = new StreamWriter(@$"{ExpFolderPath}\textLogg.txt");
+            DeleteTagsFunc = DeleteTagsAsync;
         }
         #region UI_EventHandlers
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
             var includedDTName = TB_FilterTextUdt.Text;
-            tagsFile = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
-            if (tagsFile != null)
+            TagsFile = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
+            if (TagsFile != null)
             {
-                L_PLCTagsFilePath.Text = tagsFile.FullName;
-                TB_Status.AddLine($"Selected: {tagsFile.FullName}");
+                L_PLCTagsFilePath.Text = TagsFile.FullName;
+                TB_Status.AddLine($"Selected: {TagsFile.FullName}");
                 try
                 {
                     if (TagDataList.Count >= 0)
                         TagDataList.Clear();
-                    TagDataList = await ExcelOperations.LoadTagDataListFromExcelFile(tagsFile, includedDTName);
+                    TagDataList = await ExcelOperations.LoadTagDataListFromExcelFile(TagsFile, includedDTName);
                     TB_Status.AddLine($"Acquired {TagDataList.Count} tags");
                     B_GenerateXml.IsEnabled = true;
                 }
@@ -92,41 +91,41 @@ namespace IgnitionHelper
         private async void B_GenerateXml_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
-            xmlFile = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
-            if (xmlFile != null)
+            XmlFile = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
+            if (XmlFile != null)
             {
-                L_HMITagsFilePath.Text = xmlFile.FullName;
-                doc.Load(xmlFile.FullName);
-                if (doc.DocumentElement != null)
+                L_HMITagsFilePath.Text = XmlFile.FullName;
+                XmlDoc.Load(XmlFile.FullName);
+                if (XmlDoc.DocumentElement != null)
                 {
                     try
                     {
-                        if (tempInstList.Count >= 0)
-                            tempInstList.Clear();
-                        await XmlOperations.CreateTemplatesAsync(doc.DocumentElement, tempInstList, textLogg, null, null);
-                        TB_Status.AddLine($"Number of template nodes got: {tempInstList.Count}");
+                        if (TempInstList.Count >= 0)
+                            TempInstList.Clear();
+                        await XmlOperations.CreateTemplatesAsync(XmlDoc.DocumentElement, TempInstList, TextLogg, null, null);
+                        TB_Status.AddLine($"Number of template nodes got: {TempInstList.Count}");
                     }
                     catch (Exception ex)
                     {
                         TB_Status.AddLine($"{ex.Message}");
                         TB_Status.AddLine($"{ex.StackTrace}");
                     }
-                    if (tempInstList.Count > 0)
+                    if (TempInstList.Count > 0)
                     {
                         try
                         {
-                            await XmlOperations.UpdateTagDataListWithXmlDataAsync(doc.DocumentElement, TagDataList, textLogg, null, null);
+                            await XmlOperations.UpdateTagDataListWithXmlDataAsync(XmlDoc.DocumentElement, TagDataList, TextLogg, null, null);
                             TB_Status.AddLine($"Done checking! There was aleady {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances ");
-                            await XmlOperations.AddTemplatedTagsToXmlAsync(doc.DocumentElement, TagDataList, tempInstList, textLogg, null, null);
+                            await XmlOperations.AddTemplatedTagsToXmlAsync(XmlDoc.DocumentElement, TagDataList, TempInstList, TextLogg, null, null);
                             TB_Status.AddLine($"Done editing! {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances done");
-                            string newName = expFolderPath + @"\" + xmlFile.Name.Replace(".xml", "_edit.xml");
+                            string newName = ExpFolderPath + @"\" + XmlFile.Name.Replace(".xml", "_edit.xml");
                             TB_Status.AddLine($"Found instances Added in XML and NOT CORRECT: {TagDataList.Count(item => item.IsAdded && !item.IsCorrect)}");
-                            doc.Save($"{newName}");
+                            XmlDoc.Save($"{newName}");
                             TagDataList.GetFoldersInfo(TB_Status);
                             TB_Status.AddLine($"Saved file: {newName}");
                             foreach (var item in TagDataList)
                             {
-                                textLogg.WriteLine($"name:{item.Name};dataTypePLC:{item.DataTypePLC};dataTypeVisu:{item.DataTypeVisu};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
+                                TextLogg.WriteLine($"name:{item.Name};dataTypePLC:{item.DataTypePLC};dataTypeVisu:{item.DataTypeVisu};folderName:{item.VisuFolderName};isAdded:{item.IsAdded}");
                             }
                             B_GenExcelTagData.IsEnabled = true;
                             B_ShowTagsWindow.IsEnabled = true;
@@ -144,8 +143,8 @@ namespace IgnitionHelper
         private async void B_GenExcelTagData_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
-            String filePath = expFolderPath + @"\TagDataExport.xlsx";
-            var excelPackage = ExcelOperations.CreateExcelFile(filePath, textLogg);
+            String filePath = ExpFolderPath + @"\TagDataExport.xlsx";
+            var excelPackage = ExcelOperations.CreateExcelFile(filePath, TextLogg);
             if (excelPackage == null)
             {
                 TB_Status.AddLine($"Failed to create (.xlsx) file!");
@@ -161,16 +160,16 @@ namespace IgnitionHelper
         private async void B_EditAlarmUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
-            if (doc.DocumentElement != null && xmlFile != null)
+            if (XmlDoc.DocumentElement != null && XmlFile != null)
             {
                 try
                 {
                     AlarmEditData editData = new();
-                    await XmlOperations.EditUdtAlarmsXmlAsync(doc, doc.DocumentElement, editData);
+                    await XmlOperations.EditUdtAlarmsXmlAsync(XmlDoc, XmlDoc.DocumentElement, editData);
                     TB_Status.AddLine($"Done editing Alarms! Changed: {editData.AlarmChanged}, Passed: {editData.AlarmPassed}");
-                    string newName = expFolderPath + @"\" + xmlFile.Name;
+                    string newName = ExpFolderPath + @"\" + XmlFile.Name;
                     TB_Status.AddLine($"Saved edited file in: {newName}");
-                    doc.Save($"{newName}");
+                    XmlDoc.Save($"{newName}");
                 }
                 catch (Exception ex)
                 {
@@ -193,17 +192,17 @@ namespace IgnitionHelper
                 TB_Status.AddLine($"Fill all labels!");
                 return;
             }
-            if (doc.DocumentElement != null && xmlFile != null)
+            if (XmlDoc.DocumentElement != null && XmlFile != null)
             {
                 try
                 {
                     TagPropertyEditData editData = new();
-                    textLogg.WriteLine($"Started editing {xmlFile.Name}");
-                    await XmlOperations.EditUdtPropertiesXmlAync(doc, doc.DocumentElement, editData, textLogg, tagGroup, valueToEdit, value);
+                    TextLogg.WriteLine($"Started editing {XmlFile.Name}");
+                    await XmlOperations.EditUdtPropertiesXmlAync(XmlDoc, XmlDoc.DocumentElement, editData, TextLogg, tagGroup, valueToEdit, value);
                     TB_Status.AddLine($"Done editing! Properties in Groups -> Added:{editData.GroupPropAdded} Edited:{editData.GroupPropChange}, Properties in Tags ->Added:{editData.TagPropAdded} Edited:{editData.TagPropChanged}");
-                    string newName = expFolderPath + @"\" + xmlFile.Name;
+                    string newName = ExpFolderPath + @"\" + XmlFile.Name;
                     TB_Status.AddLine($"Saved edited file in: {newName}");
-                    doc.Save($"{newName}");
+                    XmlDoc.Save($"{newName}");
                 }
                 catch (Exception ex)
                 {
@@ -224,8 +223,8 @@ namespace IgnitionHelper
             var result = openFolderDialog.ShowDialog();
             if (result == true)
             {
-                expFolderPath = openFolderDialog.SelectedPath;
-                TB_ExpFolderPath.Text = expFolderPath;
+                ExpFolderPath = openFolderDialog.SelectedPath;
+                TB_ExpFolderPath.Text = ExpFolderPath;
                 EB_ExpFolderSelected();
             }
         }
@@ -233,7 +232,7 @@ namespace IgnitionHelper
         {
             try
             {
-                Process.Start("explorer.exe", expFolderPath);
+                Process.Start("explorer.exe", ExpFolderPath);
             }
             catch (Exception ex)
             {
@@ -249,13 +248,13 @@ namespace IgnitionHelper
         }
         private void B_SelectFileToEdit_Click(object sender, RoutedEventArgs e)
         {
-            xmlFile = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
-            if (xmlFile != null)
+            XmlFile = SelectXmlFileAndTryToUse("Select file exported from Ignition (.xml)");
+            if (XmlFile != null)
             {
-                L_SelectedFileToEditPath.Text = xmlFile.FullName;
-                TB_Status.AddLine($"Selected xml file to Edit : {xmlFile.FullName}");
-                doc.Load(xmlFile.FullName);
-                if (doc.DocumentElement != null)
+                L_SelectedFileToEditPath.Text = XmlFile.FullName;
+                TB_Status.AddLine($"Selected xml file to Edit : {XmlFile.FullName}");
+                XmlDoc.Load(XmlFile.FullName);
+                if (XmlDoc.DocumentElement != null)
                 {
                     B_EditTagUdt.IsEnabled = true;
                     B_EditAlarmUdt.IsEnabled = true;
@@ -264,26 +263,26 @@ namespace IgnitionHelper
         }
         private void B_TextloggClose_Click(object sender, RoutedEventArgs e)
         {
-            textLogg.WriteLine("Manually closed.");
-            textLogg.Close();
+            TextLogg.WriteLine("Manually closed.");
+            TextLogg.Close();
         }
         private void B_SelectJsonToEdit_Click(object sender, RoutedEventArgs e)
         {
-            jsonFile = SelectJsonFileAndTryToUse("Select file exported from Ignition (.json)");
-            if (jsonFile != null)
+            JsonFile = SelectJsonFileAndTryToUse("Select file exported from Ignition (.json)");
+            if (JsonFile != null)
             {
-                L_SelectedJsonToEditPath.Text = jsonFile.FullName;
-                TB_Status.AddLine($"Selected json file to Edit : {jsonFile.FullName}");
+                L_SelectedJsonToEditPath.Text = JsonFile.FullName;
+                TB_Status.AddLine($"Selected json file to Edit : {JsonFile.FullName}");
                 try
                 {
-                    json = JObject.Parse(System.IO.File.ReadAllText(jsonFile.FullName));
+                    Json = JObject.Parse(System.IO.File.ReadAllText(JsonFile.FullName));
                 }
                 catch (Exception ex)
                 {
                     TB_Status.AddLine($"{ex.Message}");
                 }
 
-                if (jsonFile != null)
+                if (JsonFile != null)
                 {
                     B_EditTagUdtJson.IsEnabled = true;
                     B_MultiplyTagUdtJson.IsEnabled = true;
@@ -293,7 +292,7 @@ namespace IgnitionHelper
         private void B_EditTagUdtJson_Click(object sender, RoutedEventArgs e)
         {
 
-            if (jsonFile != null && json != null)
+            if (JsonFile != null && Json != null)
             {
                 int arrayIndexToFind = -1;
                 string propertyToEdit = TB_JsonPropertyToMultiply.Text;
@@ -307,13 +306,13 @@ namespace IgnitionHelper
                     TB_Status.AddLine("Index is not correct! Must be a number and greater or equal 0!");
                     return;
                 }
-                var result = JsonOperations.MultiplyProperties(json, jsonFile, expFolderPath, propertyToEdit, arrayIndexToFind, textLogg);
+                var result = JsonOperations.MultiplyProperties(Json, JsonFile, ExpFolderPath, propertyToEdit, arrayIndexToFind, TextLogg);
                 TB_Status.AddLine(result);
             }
         }
         private void B_MultiplyTagUdtJson_Click(object sender, RoutedEventArgs e)
         {
-            if (jsonFile != null && json != null)
+            if (JsonFile != null && Json != null)
             {
                 string propertyToEdit = TB_JsonPropertyToMultiply.Text;
                 string nodeNameToMultiply = TB_NodeNameToMultiply.Text;
@@ -327,7 +326,7 @@ namespace IgnitionHelper
                     TB_Status.AddLine("Edit Node name to multiply!");
                     return;
                 }
-                var result = JsonOperations.MultiplyTag(json, jsonFile, expFolderPath, propertyToEdit, nodeNameToMultiply, textLogg);
+                var result = JsonOperations.MultiplyTag(Json, JsonFile, ExpFolderPath, propertyToEdit, nodeNameToMultiply, TextLogg);
                 TB_Status.AddLine(result);
             }
         }
@@ -354,7 +353,7 @@ namespace IgnitionHelper
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            textLogg.Close();
+            TextLogg.Close();
         }
         #endregion
         #region UI Functions
@@ -488,17 +487,22 @@ namespace IgnitionHelper
         public async Task DeleteTagsAsync()
         {
             Cursor = Cursors.Wait;
-            if (xmlFile == null)
+            if (XmlFile == null)
             {
                 TB_Status.AddLine("Selected XML file does not exist!");
                 return;
             }
             try
             {
-                await XmlOperations.DeleteSelectedTagsAsync(doc.DocumentElement, TagDataList, textLogg);
+                if (XmlDoc.DocumentElement == null)
+                {
+                    TB_Status.AddLine("Selected XML has incorrect content");
+                    return;
+                }
+                await XmlOperations.DeleteSelectedTagsAsync(XmlDoc.DocumentElement, TagDataList, TextLogg);
                 TB_Status.AddLine($"Deleted {TagDataList.Count(item => item.Deleted)}/{TagDataList.Count(item => item.ToDelete)} tags(nodes)!");
-                string newName = expFolderPath + @"\" + xmlFile.Name.Replace(".xml", "_edit.xml");
-                doc.Save($"{newName}");
+                string newName = ExpFolderPath + @"\" + XmlFile.Name.Replace(".xml", "_edit.xml");
+                XmlDoc.Save($"{newName}");
                 TB_Status.AddLine($"Saved file: {newName}");
             }
             catch (Exception ex)

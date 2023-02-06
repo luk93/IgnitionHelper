@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Serialization;
+using IgnitionHelper.Data_Containers;
 using IgnitionHelper.Extensions;
 using static OfficeOpenXml.ExcelErrorValue;
 
@@ -138,9 +139,9 @@ namespace IgnitionHelper
                     if (xmlAttribute != null && xmlAttribute.Value == "typeId")
                     {
                         string dtVisuName = childNode.InnerText.Substring(childNode.InnerText.LastIndexOf(@"/") + 1, childNode.InnerText.Length - childNode.InnerText.LastIndexOf(@"/") - 1);
-                        if (dtVisuName != null)
                         {
-                            TagDataPLC newTag = new()
+                            var currentId = tagDataList.Count;
+                            TagDataPLC newTag = new(currentId)
                             {
                                 IsAdded = true,
                                 IsCorrect = false,

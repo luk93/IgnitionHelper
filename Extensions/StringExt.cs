@@ -8,7 +8,7 @@ namespace IgnitionHelper.Extensions
 {
     public static class StringExt
     {
-        public static bool Contains(this string source, string toCheck, StringComparison comp)
+        public static bool Contains(this string? source, string toCheck, StringComparison comp)
         {
             return source?.IndexOf(toCheck, comp) >= 0;
         }
