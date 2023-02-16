@@ -14,7 +14,7 @@ namespace IgnitionHelper
     {
         public static async Task<List<TagDataPLC>> LoadTagDataListFromExcelFile(FileInfo file, string inludedDTname)
         {
-            List<TagDataPLC> output = new List<TagDataPLC>();
+            List<TagDataPLC> output = new();
             var package = new ExcelPackage(file);
             await package.LoadAsync(file);
             var ws = package.Workbook.Worksheets[0];
@@ -31,9 +31,11 @@ namespace IgnitionHelper
                             if (ws.Cells[row, col + 4].Value.ToString().ContainsMany(inludedDTname, StringComparison.OrdinalIgnoreCase))
                             {
                                 var currentId = output.Count;
-                                TagDataPLC newObj = new TagDataPLC(currentId);
-                                newObj.DataTypePLC = (ws.Cells[row, col + 4].Value.ToString());
-                                newObj.Name = (ws.Cells[row, col + 2].Value.ToString());
+                                TagDataPLC newObj = new(currentId)
+                                {
+                                    DataTypePLC = (ws.Cells[row, col + 4].Value.ToString()),
+                                    Name = (ws.Cells[row, col + 2].Value.ToString())
+                                };
                                 output.Add(newObj);
                             }
                         }
@@ -45,6 +47,7 @@ namespace IgnitionHelper
         }
         public static ExcelPackage? CreateExcelFile(string path, StreamWriter streamWriter)
         {
+            if (streamWriter == null) throw new ArgumentNullException(nameof(streamWriter));
             var file = new FileInfo(path);
             if (file.Exists)
             {

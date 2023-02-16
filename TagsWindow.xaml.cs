@@ -49,7 +49,7 @@ namespace IgnitionHelper
             ClearObjects();
             this.Close();
         }
-        private void ClearObjects()
+        private static void ClearObjects()
         {
             _tagDataShorten = null;
             _tagDataObsCol = null;

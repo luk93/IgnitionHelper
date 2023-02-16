@@ -12,9 +12,9 @@ namespace IgnitionHelper.Extensions
         {
             return source?.IndexOf(toCheck, comp) >= 0;
         }
-        public static bool ContainsMany(this string source, string toCheck, StringComparison comp)
+        public static bool ContainsMany(this string? source, string toCheck, StringComparison comp)
         {
-            return toCheck.Split(";").ToArray().Any(a => source.Contains(a, comp));
+            return toCheck.Split(";").ToArray().Any(a => source != null && source.Contains(a, comp));
         }
     }
 }

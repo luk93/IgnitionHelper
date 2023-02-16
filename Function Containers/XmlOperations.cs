@@ -18,10 +18,7 @@ namespace IgnitionHelper
     {
         private static void CreateTemplates(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
-            if (output == null)
-            {
-                output = new List<TempInstanceVisu>();
-            }
+            output ??= new List<TempInstanceVisu>();
             path = GetPath(node, path);
             folderName = GetFolderName(path);
             foreach (XmlNode childNode1 in node.ChildNodes)
@@ -90,7 +87,7 @@ namespace IgnitionHelper
                                                 if (dtVisuName != null)
                                                 {
                                                     //string tolerance is both side:
-                                                    if ((dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
+                                                    if (tagData.DataTypePLC != null && (dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
@@ -236,12 +233,13 @@ namespace IgnitionHelper
                                     if (!tagData.IsAdded)
                                     {
                                         //tolerance in names extended
-                                        TempInstanceVisu? tempInst = tempInstList.Find(item => (item.Name.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
-                                                                                            tagData.DataTypePLC.Contains(item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
+                                        TempInstanceVisu? tempInst = tempInstList.Find(item => tagData.DataTypePLC != null && (item.Name.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
+                                            tagData.DataTypePLC.Contains(item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
                                         if (tempInst != null)
                                         {
                                             XmlNode? newNode = tempInst.Node.CloneNode(true);
-                                            tempInst.Node.Attributes["name"].Value = tagData.Name;
+                                            if (tempInst.Node.Attributes != null)
+                                                tempInst.Node.Attributes["name"]!.Value = tagData.Name;
                                             node.InsertAfter(newNode, node.LastChild);
                                             streamWriter.WriteLine($"Added Node: {tagData.Name}");
                                             tagData.IsAdded = true;
@@ -418,7 +416,7 @@ namespace IgnitionHelper
                                                         int cutPosition = textToCut.IndexOf(cutName) + cutName.Length;
                                                         childNode3.InnerText = textToCut[..cutPosition];
                                                         //Edit new Node "label"
-                                                        if (newNode.Attributes != null) newNode.Attributes["name"].Value = "label";
+                                                        if (newNode.Attributes != null) newNode.Attributes["name"]!.Value = "label";
                                                         newNode.InnerText = textToCut[cutPosition..];
                                                         //Insert new node
                                                         childNode2.InsertAfter(newNode, childNode2.LastChild);

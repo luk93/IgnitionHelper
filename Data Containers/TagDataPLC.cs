@@ -4,7 +4,7 @@
     public class TagDataPLC
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public string? DataTypePLC { get; set; }
         public string DataTypeVisu { get; set; }
         public bool IsAdded { get; set; }
@@ -33,7 +33,7 @@
             ToDelete = false;
         }
 
-        public TagDataPLC(string name, string? dataTypePLC, string dataTypeVisu, int id)
+        public TagDataPLC(string? name, string? dataTypePLC, string dataTypeVisu, int id)
         {
             Id = id;
             Name = name;
