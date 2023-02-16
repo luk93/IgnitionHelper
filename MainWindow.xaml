@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IgnitionHelper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="493" Width="800" MinWidth="600" MinHeight="450" 
+        Title="IgnitionHelper" Height="493" Width="800" MinWidth="600" MinHeight="450" 
         Background="#546A76"
         Foreground="#F5E9E2">
     <Grid Margin="0,0,0,20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180*"/>
-            <ColumnDefinition Width="600*"/>
-            <ColumnDefinition Width="100*"/>
+            <ColumnDefinition Width="33*"/>
+            <ColumnDefinition Width="131*"/>
+            <ColumnDefinition Width="545*"/>
+            <ColumnDefinition Width="91*"/>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
@@ -23,20 +24,12 @@
             <RowDefinition Height="226*"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <Button x:Name ="B_TextloggClose" Grid.Row="0" Grid.Column="2" Content="LoggClose" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Height="20" Click="B_TextloggClose_Click" Margin="5,28,0,0" IsEnabled="true">
-            <Button.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#547A80"/>
-                    <GradientStop Color="#F5E9E2" Offset="1"/>
-                </LinearGradientBrush>
-            </Button.Background>
-        </Button>
-        <GroupBox Foreground="#F5E9E2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Header="Export Folder" Width="Auto" Margin="10,5,5,5"/>
-        <ScrollViewer Grid.Row="3" Grid.ColumnSpan="3" Margin="10,10,10,0" CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Grid.RowSpan="2">
+        <GroupBox Foreground="#F5E9E2" Grid.ColumnSpan="4" Header="Export Folder" Width="Auto" Margin="10,5,9,5"/>
+        <ScrollViewer Grid.Row="3" Grid.ColumnSpan="4" Margin="10,10,10,0" CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Grid.RowSpan="2">
             <TextBlock x:Name= "TB_Status"  TextWrapping="Wrap"  Height="Auto" Width="Auto" ><Run Language="pl-pl"/><LineBreak/><Run Language="pl-pl"/></TextBlock>
         </ScrollViewer>
         <!--Tab Control-->
-        <TabControl  Foreground="#F5E9E2" Grid.ColumnSpan="3" Margin="10,1,9,4" Grid.RowSpan="2" Grid.Row="1">
+        <TabControl  Foreground="#F5E9E2" Grid.ColumnSpan="4" Margin="10,1,9,4" Grid.RowSpan="2" Grid.Row="1">
             <!--DataTypeInstance Tab-->
             <TabItem Header="DataTypeInstance">
                 <Grid>
@@ -268,7 +261,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name ="B_SelectExpFolder" Content="Select path" HorizontalAlignment="Left" Margin="19,26,0,0" VerticalAlignment="Top" Width="66" Click="B_SelectExpFolder_Click" Height="20">
+        <Button x:Name ="B_SelectExpFolder" Content="Select path" HorizontalAlignment="Left" Margin="19,26,0,0" VerticalAlignment="Top" Width="66" Click="B_SelectExpFolder_Click" Height="20" Grid.ColumnSpan="2">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#547A80"/>
@@ -276,8 +269,8 @@
                 </LinearGradientBrush>
             </Button.Background>
         </Button>
-        <TextBlock x:Name="TB_ExpFolderPath" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.Column="1" Margin="0,28,0,0"/>
-        <Button x:Name ="B_OpenExpFolder" Content="Open" HorizontalAlignment="Left" Margin="90,26,0,0" VerticalAlignment="Top" Width="66" Click="B_OpenExpFolder_Click" Height="20" IsEnabled="False">
+        <TextBlock x:Name="TB_ExpFolderPath" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.Column="2" Margin="0,28,0,0"/>
+        <Button x:Name ="B_OpenExpFolder" Content="Open" HorizontalAlignment="Left" Margin="57,26,0,0" VerticalAlignment="Top" Width="66" Click="B_OpenExpFolder_Click" Height="20" IsEnabled="False" Grid.Column="1">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#547A80"/>
