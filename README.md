@@ -25,4 +25,4 @@ Features: \
 (1) - Select (.json) file which contains tags (containing Array of tags) exported from Ignition (HMI) \
 After filling textblocks with correct data it is possible to change Array of tags: \
 (2) - Multiply tag property (Property to Multiply) with index (Array Index) to replace tag properties in every other tag in Array \
-(3) - Multiply node defined by name (nodeNameToMultiply) to replace every other node (tag in Array) with this node (leaving only old name of node) \
+(3) - Multiply node defined by name (nodeNameToMultiply) to replace every other node (tag in Array) with this node (leaving only old name of node)
