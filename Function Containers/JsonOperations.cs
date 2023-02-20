@@ -39,7 +39,7 @@ namespace IgnitionHelper.Function_Containers
                 }
                 catch (Exception ex)
                 {
-                    return ex.Message;
+                    return ex.Message + "\n" + ex.StackTrace;
                 }
             }
             if (copiedtoken == null)
@@ -58,19 +58,19 @@ namespace IgnitionHelper.Function_Containers
                         var newToken = JsonConvert.DeserializeObject(tokenString) as JToken;
                         if (newToken == null)
                         {
-                            streamWriter.WriteLineAsync($"\nToken[{arrayIndexFound}] was null!");
+                            streamWriter.WriteLine($"\nToken[{arrayIndexFound}] was null!");
                         }
                         else
                         {
                             token[propertyToEdit] = newToken;
-                            streamWriter.WriteLineAsync($"\nEdited token {copiedName}[{arrayIndexFound}] -> property name: {propertyToEdit}");
+                            streamWriter.WriteLine($"\nEdited token {copiedName}[{arrayIndexFound}] -> property name: {propertyToEdit}");
                         }
 
                     }
                 }
                 catch (Exception ex)
                 {
-                    return ex.Message;
+                    return ex.Message + "\n" + ex.StackTrace;
                 }
             }
             var newJsonObject = jsonObj.DeepClone();
@@ -86,7 +86,7 @@ namespace IgnitionHelper.Function_Containers
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return ex.Message +"\n"+ ex.StackTrace;
             }
         }
         public static string MultiplyTag(JObject jsonObj, FileInfo jsonFile, string exportPath, string propertyToEdit, string tagNameToMultiply, StreamWriter streamWriter)
@@ -126,7 +126,7 @@ namespace IgnitionHelper.Function_Containers
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return ex.Message + "\n" + ex.StackTrace;
             }
         }
 
