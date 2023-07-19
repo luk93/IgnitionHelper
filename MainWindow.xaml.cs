@@ -183,10 +183,10 @@ namespace IgnitionHelper
         private async void B_EditTagUdt_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
-            string tagGroup = TB_TagGroup.Text;
+            TagGroupPath tagGroup = new TagGroupPath(TB_TagGroup.Text);
             string valueToEdit = TB_ValueToEdit.Text;
             string value = TB_EditValue.Text;
-            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup) || string.IsNullOrEmpty(valueToEdit))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tagGroup.SourcePath) || string.IsNullOrEmpty(valueToEdit))
             {
                 TB_Status.AddLine($"Fill all labels!");
                 return;

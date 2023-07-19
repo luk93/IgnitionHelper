@@ -16,6 +16,7 @@ namespace IgnitionHelper
 {
     public static class XmlOperations
     {
+        #region Xml Functions
         private static void CreateTemplates(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
             output ??= new List<TempInstanceVisu>();
@@ -185,7 +186,7 @@ namespace IgnitionHelper
                                             string dtVisuName = childNode2.InnerText.Substring(childNode2.InnerText.LastIndexOf(@"/") + 1, childNode2.InnerText.Length - childNode2.InnerText.LastIndexOf(@"/") - 1);
                                             if (dtVisuName != null)
                                             {
-                                                if(dtVisuName == tagData.DataTypeVisu)
+                                                if (dtVisuName == tagData.DataTypeVisu)
                                                 {
                                                     node.RemoveChild(childNode1);
                                                     streamWriter.WriteLine($"Deleted node! Name: {tagData.Name} DataTypeVisu: {tagData.DataTypeVisu}");
@@ -260,7 +261,7 @@ namespace IgnitionHelper
                 AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
             }
         }
-        private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, TagGroupPath tagGroupPath, string valueToEdit, string value)
         {
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
@@ -271,92 +272,97 @@ namespace IgnitionHelper
                     if (tagType != null && tagName != null)
                     {
                         //Find correct group of Tags in Each Tag (for example CB)
-                        if ((tagType.Value == "Folder" || tagType.Value == "AtomicTag") && tagName.Value == tagGroup)
+                        if ((tagType.Value == "Folder" || tagType.Value == "AtomicTag") && tagName.Value == tagGroupPath.TagGroupToFind)
                         {
-                            bool groupPropFound = false;
-                            foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                            if (tagGroupPath.IsTargetTagGroup())
                             {
-                                //Change to valueToEdit to value for group of Tags
-                                if (childNode2.Name == "Property" && childNode2.Attributes != null)
+                                tagGroupPath.ResetPathToFind();
+                                bool groupPropFound = false;
+                                foreach (XmlNode childNode2 in childNode1.ChildNodes)
                                 {
-                                    XmlAttribute? valueToEditAtt = childNode2.Attributes["name"];
-                                    if (valueToEditAtt != null)
+                                    //Change to valueToEdit to value for group of Tags
+                                    if (childNode2.Name == "Property" && childNode2.Attributes != null)
                                     {
-                                        if (valueToEditAtt.Value == valueToEdit)
+                                        XmlAttribute? valueToEditAtt = childNode2.Attributes["name"];
+                                        if (valueToEditAtt != null)
                                         {
-                                            groupPropFound = true;
-                                            editData.GroupPropChange++;
-                                            childNode2.InnerText = value;
-                                            streamWriter.WriteLine($"Changed property in group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                            if (valueToEditAtt.Value == valueToEdit)
+                                            {
+                                                groupPropFound = true;
+                                                editData.GroupPropChange++;
+                                                childNode2.InnerText = value;
+                                                streamWriter.WriteLine($"Changed property in group: {tagGroupPath.SourcePath}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                            }
                                         }
                                     }
-                                }
-                                if (childNode2.Name == "Tags")
-                                {
-                                    foreach (XmlNode childNode3 in childNode2.ChildNodes)
+                                    if (childNode2.Name == "Tags")
                                     {
-                                        if (childNode3.Name == "Tag" && childNode3.Attributes != null)
+                                        foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                         {
-                                            //Edit All tags from this group 
-                                            string childTagNameValue = "";
-                                            var childTagName = childNode3.Attributes["name"];
-                                            if (childTagName != null)
+                                            if (childNode3.Name == "Tag" && childNode3.Attributes != null)
                                             {
-                                                childTagNameValue = childTagName.Value;
-                                            }
-                                            bool tagPropFound = false;
-                                            foreach (XmlNode childNode4 in childNode3.ChildNodes)
-                                            {
-                                                if (childNode4.Name == "Property" && childNode4.Attributes != null)
+                                                //Edit All tags from this group 
+                                                string childTagNameValue = "";
+                                                var childTagName = childNode3.Attributes["name"];
+                                                if (childTagName != null)
                                                 {
-                                                    XmlAttribute? valueToEditAtt = childNode4.Attributes["name"];
-                                                    if (valueToEditAtt != null)
+                                                    childTagNameValue = childTagName.Value;
+                                                }
+                                                bool tagPropFound = false;
+                                                foreach (XmlNode childNode4 in childNode3.ChildNodes)
+                                                {
+                                                    if (childNode4.Name == "Property" && childNode4.Attributes != null)
                                                     {
-                                                        if (valueToEditAtt.Value == valueToEdit)
+                                                        XmlAttribute? valueToEditAtt = childNode4.Attributes["name"];
+                                                        if (valueToEditAtt != null)
                                                         {
-                                                            tagPropFound = true;
-                                                            editData.TagPropChanged++;
-                                                            childNode4.InnerText = value;
-                                                            streamWriter.WriteLine($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                            if (valueToEditAtt.Value == valueToEdit)
+                                                            {
+                                                                tagPropFound = true;
+                                                                editData.TagPropChanged++;
+                                                                childNode4.InnerText = value;
+                                                                streamWriter.WriteLine($"Changed property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
-                                            if (!tagPropFound)
-                                            {
-                                                //Create new node with attribute
-                                                XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
-                                                XmlAttribute xmlAttribute = doc.CreateAttribute("name");
-                                                xmlAttribute.Value = valueToEdit;
-                                                if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
-                                                newNode.InnerText = value;
-                                                editData.TagPropAdded++;
-                                                childNode3.InsertAfter(newNode, childNode3.LastChild);
-                                                streamWriter.WriteLine($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                if (!tagPropFound)
+                                                {
+                                                    //Create new node with attribute
+                                                    XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
+                                                    XmlAttribute xmlAttribute = doc.CreateAttribute("name");
+                                                    xmlAttribute.Value = valueToEdit;
+                                                    if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
+                                                    newNode.InnerText = value;
+                                                    editData.TagPropAdded++;
+                                                    childNode3.InsertAfter(newNode, childNode3.LastChild);
+                                                    streamWriter.WriteLine($"Added property in Tag: {childTagNameValue}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                                }
                                             }
                                         }
                                     }
                                 }
+                                if (!groupPropFound)
+                                {
+                                    //Create new node with attribute
+                                    XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
+                                    XmlAttribute xmlAttribute = doc.CreateAttribute("name");
+                                    xmlAttribute.Value = valueToEdit;
+                                    if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
+                                    newNode.InnerText = value;
+                                    editData.GroupPropAdded++;
+                                    childNode1.InsertAfter(newNode, childNode1.LastChild);
+                                    streamWriter.WriteLine($"Added property in Group: {tagGroupPath}, ValueToEdit:{valueToEdit}, EditValue: {value}");
+                                }
                             }
-                            if (!groupPropFound)
-                            {
-                                //Create new node with attribute
-                                XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Property", "");
-                                XmlAttribute xmlAttribute = doc.CreateAttribute("name");
-                                xmlAttribute.Value = valueToEdit;
-                                if (newNode.Attributes != null) newNode.Attributes.SetNamedItem(xmlAttribute);
-                                newNode.InnerText = value;
-                                editData.GroupPropAdded++;
-                                childNode1.InsertAfter(newNode, childNode1.LastChild);
-                                streamWriter.WriteLine($"Added property in Group: {tagGroup}, ValueToEdit:{valueToEdit}, EditValue: {value}");
-                            }
+                            tagGroupPath.Update();
                         }
                     }
                 }
-            }
-            foreach (XmlNode childNode1 in node.ChildNodes)
-            {
-                EditUdtPropertiesXml(doc, childNode1, editData, streamWriter, tagGroup, valueToEdit, value);
+                foreach (XmlNode childNode2 in childNode1.ChildNodes)
+                {
+                    EditUdtPropertiesXml(doc, childNode2, editData, streamWriter, tagGroupPath, valueToEdit, value);
+                }
             }
         }
         private static void EditUdtAlarmsXml(XmlDocument doc, XmlNode node, AlarmEditData editData)
@@ -443,7 +449,9 @@ namespace IgnitionHelper
                 EditUdtAlarmsXml(doc, childNode1, editData);
             }
         }
+        #endregion
 
+        #region Xml Tasks
         public static Task CreateTemplatesAsync(XmlNode node, List<TempInstanceVisu> output, StreamWriter streamWriter, string? folderName, string? path)
         {
             return Task.Run(() => CreateTemplates(node, output, streamWriter, folderName, path));
@@ -460,15 +468,17 @@ namespace IgnitionHelper
         {
             return Task.Run(() => AddTemplatedTagsToXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
         }
-        public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, string tagGroup, string valueToEdit, string value)
+        public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, TagGroupPath tagGroupPath, string valueToEdit, string value)
         {
-            return Task.Run(() => EditUdtPropertiesXml(doc, node, editData, streamWriter, tagGroup, valueToEdit, value));
+            return Task.Run(() => EditUdtPropertiesXml(doc, node, editData, streamWriter, tagGroupPath, valueToEdit, value));
         }
         public static Task EditUdtAlarmsXmlAsync(XmlDocument doc, XmlNode node, AlarmEditData editData)
         {
             return Task.Run(() => EditUdtAlarmsXml(doc, node, editData));
         }
+        #endregion
 
+        #region Tools
         private static string GetFolderName(string? path)
         {
             string output = "";
@@ -493,5 +503,6 @@ namespace IgnitionHelper
             }
             return result;
         }
+        #endregion
     }
 }
