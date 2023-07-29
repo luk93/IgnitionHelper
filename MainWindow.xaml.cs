@@ -113,7 +113,8 @@ namespace IgnitionHelper
                     {
                         try
                         {
-                            await XmlOperations.UpdateTagDataListWithXmlDataAsync(XmlDoc.DocumentElement, TagDataList, _textLogg, null, null);
+                            bool isNameTolerance = CB_ExtendNameToleration.IsChecked ?? false;
+                            await XmlOperations.UpdateTagDataListWithXmlDataAsync(XmlDoc.DocumentElement, TagDataList, _textLogg, null, null, isNameTolerance);
                             TB_Status.AddLine($"Done checking! There was aleady {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances ");
                             await XmlOperations.AddTemplatedTagsToXmlAsync(XmlDoc.DocumentElement, TagDataList, _tempInstList, _textLogg, null, null);
                             TB_Status.AddLine($"Done editing! {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances done");

@@ -55,7 +55,7 @@ namespace IgnitionHelper
                 CreateTemplates(childNode1, output, streamWriter, folderName, path);
             }
         }
-        private static void UpdateTagDataListWithXmlData(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
+        private static void UpdateTagDataListWithXmlData(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path, bool isNameTolerance)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -88,7 +88,9 @@ namespace IgnitionHelper
                                                 if (dtVisuName != null)
                                                 {
                                                     //string tolerance is both side:
-                                                    if (tagData.DataTypePLC != null && (dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || StringExt.Contains(tagData.DataTypePLC, dtVisuName, StringComparison.OrdinalIgnoreCase)))
+                                                    if (tagData.DataTypePLC != null && 
+                                                       ((isNameTolerance && (dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || tagData.DataTypePLC.Contains(dtVisuName, StringComparison.OrdinalIgnoreCase))) ||
+                                                       (!isNameTolerance && string.Compare(dtVisuName,tagData.DataTypePLC,StringComparison.OrdinalIgnoreCase) == 0)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
@@ -122,7 +124,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                UpdateTagDataListWithXmlData(childNode1, tagDataList, streamWriter, folderName, path);
+                UpdateTagDataListWithXmlData(childNode1, tagDataList, streamWriter, folderName, path, isNameTolerance);
             }
         }
         private static void AddOnlyHMITagToTagDataList(XmlNode node, XmlAttribute udtAttribute, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string folderName, string? path)
@@ -456,9 +458,9 @@ namespace IgnitionHelper
         {
             return Task.Run(() => CreateTemplates(node, output, streamWriter, folderName, path));
         }
-        public static Task UpdateTagDataListWithXmlDataAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path)
+        public static Task UpdateTagDataListWithXmlDataAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter, string? folderName, string? path, bool isNameTolerance)
         {
-            return Task.Run(() => UpdateTagDataListWithXmlData(node, tagDataList, streamWriter, folderName, path));
+            return Task.Run(() => UpdateTagDataListWithXmlData(node, tagDataList, streamWriter, folderName, path, isNameTolerance));
         }
         public static Task DeleteSelectedTagsAsync(XmlNode node, List<TagDataPLC> tagDataList, StreamWriter streamWriter)
         {

@@ -90,6 +90,8 @@
                     </Button>
                     <TextBlock x:Name="L_PLCTagsFilePath" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="Tags from PLC file (.xlsx) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Grid.ColumnSpan="3"/>
                     <TextBlock x:Name="L_HMITagsFilePath" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Tags from Ignition file (.xml) path" VerticalAlignment="Top" Height="Auto" Width="Auto" Margin="0,5,0,0" Grid.ColumnSpan="3"/>
+                    <TextBlock x:Name="L_ExtendNameToleration" Grid.Row="2" Grid.Column="4" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Extend udt names comparision" VerticalAlignment="Top" Height="Auto" Width="Auto" Margin="0,5,0,0" Grid.ColumnSpan="3"/>
+                    <CheckBox x:Name="CB_ExtendNameToleration" Grid.Row="2" Grid.Column="4" HorizontalAlignment="Right"  VerticalAlignment="Top" Height="Auto" Width="Auto" Margin="0,5,5,0" />
                 </Grid>
             </TabItem>
             <!--DataTypeDefinition Tab-->
