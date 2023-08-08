@@ -213,7 +213,7 @@ namespace IgnitionHelper
                 DeleteSelectedTags(childNode1, tagDataList, streamWriter);
             }
         }
-        private static void AddTemplatedTagsToXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
+        private static void AddTemplatedTagsToXml(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path, bool isNameTolerance)
         {
             path = GetPath(node, path);
             folderName = GetFolderName(path);
@@ -236,8 +236,9 @@ namespace IgnitionHelper
                                     if (!tagData.IsAdded)
                                     {
                                         //tolerance in names extended
-                                        TempInstanceVisu? tempInst = tempInstList.Find(item => tagData.DataTypePLC != null && (item.Name.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) ||
-                                            tagData.DataTypePLC.Contains(item.Name, StringComparison.OrdinalIgnoreCase)) && item.FolderName == folderName);
+                                        TempInstanceVisu? tempInst = tempInstList.Find(item => tagData.DataTypePLC != null && item.FolderName == folderName &&
+                                        ((isNameTolerance && (item.Name.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || tagData.DataTypePLC.Contains(item.Name, StringComparison.OrdinalIgnoreCase))) ||
+                                        (!isNameTolerance && string.Compare(item.Name, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) == 0)));
                                         if (tempInst != null)
                                         {
                                             XmlNode? newNode = tempInst.Node.CloneNode(true);
@@ -260,7 +261,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path);
+                AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path,isNameTolerance);
             }
         }
         private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, TagGroupPath tagGroupPath, string valueToEdit, string value)
@@ -466,9 +467,9 @@ namespace IgnitionHelper
         {
             return Task.Run(() => DeleteSelectedTags(node, tagDataList, streamWriter));
         }
-        public static Task AddTemplatedTagsToXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path)
+        public static Task AddTemplatedTagsToXmlAsync(XmlNode node, List<TagDataPLC> tagDataList, List<TempInstanceVisu> tempInstList, StreamWriter streamWriter, string? folderName, string? path, bool isNameTolerance)
         {
-            return Task.Run(() => AddTemplatedTagsToXml(node, tagDataList, tempInstList, streamWriter, folderName, path));
+            return Task.Run(() => AddTemplatedTagsToXml(node, tagDataList, tempInstList, streamWriter, folderName, path, isNameTolerance));
         }
         public static Task EditUdtPropertiesXmlAync(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, TagGroupPath tagGroupPath, string valueToEdit, string value)
         {

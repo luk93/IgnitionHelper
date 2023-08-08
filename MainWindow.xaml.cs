@@ -116,7 +116,7 @@ namespace IgnitionHelper
                             bool isNameTolerance = CB_ExtendNameToleration.IsChecked ?? false;
                             await XmlOperations.UpdateTagDataListWithXmlDataAsync(XmlDoc.DocumentElement, TagDataList, _textLogg, null, null, isNameTolerance);
                             TB_Status.AddLine($"Done checking! There was aleady {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances ");
-                            await XmlOperations.AddTemplatedTagsToXmlAsync(XmlDoc.DocumentElement, TagDataList, _tempInstList, _textLogg, null, null);
+                            await XmlOperations.AddTemplatedTagsToXmlAsync(XmlDoc.DocumentElement, TagDataList, _tempInstList, _textLogg, null, null, isNameTolerance);
                             TB_Status.AddLine($"Done editing! {TagDataList.Count(item => item.IsAdded)}/{TagDataList.Count} instances done");
                             string newName = _expFolderPath + @"\" + XmlFile.Name.Replace(".xml", "_edit.xml");
                             TB_Status.AddLine($"Found instances Added in XML and NOT CORRECT: {TagDataList.Count(item => item.IsAdded && !item.IsCorrect)}");
