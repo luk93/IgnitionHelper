@@ -45,6 +45,7 @@ namespace IgnitionHelper
         private static string _expFolderPath = @"C:\Users\plradlig\Desktop\Lucid\Ignition\ExportFiles\App_Exp_files";
 
         public List<TagDataPLC> TagDataList { get; set; }
+        public List<VisuTag> VisuTagList { get; set; }
         public Func<Task> DeleteTagsFunc { get; set; }
 
         public MainWindow()
@@ -54,6 +55,7 @@ namespace IgnitionHelper
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             TagDataList = new List<TagDataPLC>();
+            VisuTagList = new List<VisuTag>();
             _tempInstList = new List<TempInstanceVisu>();
             XmlDoc = new();
             Json = null;
@@ -258,6 +260,7 @@ namespace IgnitionHelper
                 {
                     B_EditTagUdt.IsEnabled = true;
                     B_EditAlarmUdt.IsEnabled = true;
+                    B_CheckTags.IsEnabled = true;
                 }
             }
         }
@@ -348,6 +351,33 @@ namespace IgnitionHelper
             }
             TB_Status.AddLine("Fill TextBox 'Strings included in Data Type name'!");
             B_SelectTagsXLSX.IsEnabled = false;
+        }
+        private async void B_CheckTags_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            DisableButtonAndChangeCursor(sender);
+            if (VisuTagList.Count >= 0)
+                VisuTagList.Clear();
+            if (XmlDoc.DocumentElement == null)
+            {
+                TB_Status.AddLine("Selected xml is not correct!");
+                EnableButtonAndChangeCursor(sender);
+                return;
+            }
+            TB_Status.AddLine("Checking Visu Tags Started!");
+            await XmlOperations.CheckVisuTagsXmlAsync(XmlDoc, XmlDoc.DocumentElement, VisuTagList, _textLogg, string.Empty,0, string.Empty);
+            String filePath = _expFolderPath + @"\CheckTagsResult.xlsx";
+            var excelPackage = ExcelOperations.CreateExcelFile(filePath, _textLogg);
+            if (excelPackage == null)
+            {
+                TB_Status.AddLine($"Failed to create (.xlsx) file!");
+                return;
+            }
+            var ws = excelPackage.Workbook.Worksheets.Add("Check Tag Result");
+            var range = ws.Cells["A1"].LoadFromCollection(VisuTagList, true);
+            range.AutoFitColumns();
+            await ExcelOperations.SaveExcelFile(excelPackage);
+            TB_Status.AddLine($"Created file : {filePath}");
+            EnableButtonAndChangeCursor(sender);
         }
         protected override void OnClosed(EventArgs e)
         {

@@ -88,9 +88,9 @@ namespace IgnitionHelper
                                                 if (dtVisuName != null)
                                                 {
                                                     //string tolerance is both side:
-                                                    if (tagData.DataTypePLC != null && 
+                                                    if (tagData.DataTypePLC != null &&
                                                        ((isNameTolerance && (dtVisuName.Contains(tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) || tagData.DataTypePLC.Contains(dtVisuName, StringComparison.OrdinalIgnoreCase))) ||
-                                                       (!isNameTolerance && string.Compare(dtVisuName,tagData.DataTypePLC,StringComparison.OrdinalIgnoreCase) == 0)))
+                                                       (!isNameTolerance && string.Compare(dtVisuName, tagData.DataTypePLC, StringComparison.OrdinalIgnoreCase) == 0)))
                                                     {
                                                         tagData.IsAdded = true;
                                                         tagData.IsCorrect = true;
@@ -261,7 +261,7 @@ namespace IgnitionHelper
             }
             foreach (XmlNode childNode1 in node.ChildNodes)
             {
-                AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path,isNameTolerance);
+                AddTemplatedTagsToXml(childNode1, tagDataList, tempInstList, streamWriter, folderName, path, isNameTolerance);
             }
         }
         private static void EditUdtPropertiesXml(XmlDocument doc, XmlNode node, TagPropertyEditData editData, StreamWriter streamWriter, TagGroupPath tagGroupPath, string valueToEdit, string value)
@@ -281,6 +281,7 @@ namespace IgnitionHelper
                             {
                                 tagGroupPath.ResetPathToFind();
                                 bool groupPropFound = false;
+                                //Temp
                                 foreach (XmlNode childNode2 in childNode1.ChildNodes)
                                 {
                                     //Change to valueToEdit to value for group of Tags
@@ -300,6 +301,7 @@ namespace IgnitionHelper
                                     }
                                     if (childNode2.Name == "Tags")
                                     {
+                                        
                                         foreach (XmlNode childNode3 in childNode2.ChildNodes)
                                         {
                                             if (childNode3.Name == "Tag" && childNode3.Attributes != null)
@@ -452,6 +454,59 @@ namespace IgnitionHelper
                 EditUdtAlarmsXml(doc, childNode1, editData);
             }
         }
+        private static void CheckVisuTagsXml(XmlDocument doc, XmlNode node, List<VisuTag> visuTags, StreamWriter streamWriter, string? demandedPath, int nestLevel, string udtName)
+        {
+            if (node.Name == "Tag" && node.Attributes != null)
+            {
+                XmlAttribute? tagType = node.Attributes["type"];
+                XmlAttribute? tagName = node.Attributes["name"];
+                if (tagType != null && tagName != null)
+                {
+                    //udt Found
+                    if (tagType.Value == "UdtType")
+                    {
+                        udtName = tagName.Value; 
+                        nestLevel = 0;
+                    }
+                    //Find correct group of Tags in Each Tag (for example CB)
+                    if (tagType.Value == "Folder")
+                    {
+                        if (tagType.Value == "Folder")
+                            demandedPath += $@"/{tagName.Value}";
+                    }
+                }
+            }
+            if (node.Name == "Property" && node.Attributes != null)
+            {
+                XmlAttribute? property = node.Attributes["name"];
+                if (property != null)
+                {
+                    if (property.Value == "opcItemPath")
+                    {
+                        #pragma warning disable CS8602 // Dereference of a possibly null reference.
+                        XmlAttribute? parentProperty = node.ParentNode?.Attributes["name"];
+                        #pragma warning restore CS8602 // Dereference of a possibly null reference.
+                        string tagName = string.Empty;
+                        if (parentProperty != null) 
+                            tagName = parentProperty.Value;
+                        string definedPath = string.Empty;
+                        definedPath = node.InnerText;
+                        visuTags.Add(new VisuTag(udtName, tagName, demandedPath, definedPath));
+                        streamWriter.WriteLine(visuTags?.LastOrDefault()?.ToString());
+                    }
+                }
+            }
+            //Change to valueToEdit to value for group of Tags
+            if (nestLevel == 0)
+            {
+                nestLevel = 1;
+                demandedPath = string.Empty;
+            }
+            foreach (XmlNode childNode1 in node.ChildNodes)
+            {
+                CheckVisuTagsXml(doc, childNode1, visuTags, streamWriter, demandedPath, nestLevel, udtName);
+            }
+        }
         #endregion
 
         #region Xml Tasks
@@ -478,6 +533,10 @@ namespace IgnitionHelper
         public static Task EditUdtAlarmsXmlAsync(XmlDocument doc, XmlNode node, AlarmEditData editData)
         {
             return Task.Run(() => EditUdtAlarmsXml(doc, node, editData));
+        }
+        public static Task CheckVisuTagsXmlAsync(XmlDocument doc, XmlNode node, List<VisuTag> visuTags, StreamWriter streamWriter, string? demandedPath, int nestLevel, string udtName)
+        {
+            return Task.Run(() => CheckVisuTagsXml(doc, node, visuTags, streamWriter, demandedPath, nestLevel, udtName));
         }
         #endregion
 

@@ -59,13 +59,10 @@ namespace IgnitionHelper.Function_Containers
                         if (newToken == null)
                         {
                             streamWriter.WriteLine($"\nToken[{arrayIndexFound}] was null!");
+                            continue;
                         }
-                        else
-                        {
-                            token[propertyToEdit] = newToken;
-                            streamWriter.WriteLine($"\nEdited token {copiedName}[{arrayIndexFound}] -> property name: {propertyToEdit}");
-                        }
-
+                        token[propertyToEdit] = newToken;
+                        streamWriter.WriteLine($"\nEdited token {copiedName}[{arrayIndexFound}] -> property name: {propertyToEdit}");
                     }
                 }
                 catch (Exception ex)

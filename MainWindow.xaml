@@ -200,6 +200,14 @@
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
+                    <Button x:Name ="B_CheckTags" Grid.Column="1" Grid.Row="3" Content="Check Tags" HorizontalAlignment="Left" Margin="-23,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_CheckTags_ClickAsync" IsEnabled="False">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
                 </Grid>
             </TabItem>
             <!--Tag/uDT JSON editor Tab-->
