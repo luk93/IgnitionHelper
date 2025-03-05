@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IgnitionHelper.Data_Containers;
+using System.Security.RightsManagement;
 
 namespace IgnitionHelper
 {
@@ -42,6 +43,33 @@ namespace IgnitionHelper
                     }
                     row++;
                 }
+            }
+            return output;
+        }
+        public static async Task<Dictionary<int,string>?> LoadDefLocFromExcelFile(FileInfo file)
+        {
+            Dictionary<int, string> output = new();
+            var package = new ExcelPackage(file);
+            await package.LoadAsync(file);
+            var ws = package.Workbook.Worksheets[0];
+            int row = 2;
+            int col = 1;
+            if (ws == null)
+                return null;
+            
+            while (!string.IsNullOrWhiteSpace(ws.Cells[row, col].Value?.ToString()))
+            { 
+                if (string.IsNullOrWhiteSpace(ws.Cells[row, col + 1].Value?.ToString()))
+                {
+                    row++;
+                    continue;
+                }
+                if (int.TryParse(ws.Cells[row, col].Value?.ToString(), out int dicKey))
+                {
+                    string dicValue = ws.Cells[row, col + 1].Value?.ToString();
+                    output.Add(dicKey, dicValue);
+                }
+                row++;
             }
             return output;
         }

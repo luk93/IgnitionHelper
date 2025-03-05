@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IgnitionHelper"
         mc:Ignorable="d"
-        Title="IgnitionHelper" Height="493" Width="800" MinWidth="600" MinHeight="450" 
+        Title="IgnitionHelper" Height="493" Width="800" MinWidth="600" MinHeight="550" 
         Background="#546A76"
         Foreground="#F5E9E2">
     <Grid Margin="0,0,0,20">
@@ -230,6 +230,7 @@
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="20*"/>
+                        <RowDefinition Height="20*"/>
                     </Grid.RowDefinitions>
                     <Grid.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -261,6 +262,22 @@
                     </Button>
                     <TextBox x:Name="TB_NodeNameToMultiply" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="nodeNameToMultiply" VerticalAlignment="Top" Width="140" Height="20"/>
                     <Button x:Name ="B_MultiplyTagUdtJson" Grid.Column="3" Grid.Row="3" Content="Multiply Node" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_MultiplyTagUdtJson_Click" IsEnabled="False">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button x:Name ="B_SelectDefLocXlsx" Grid.Column="0" Grid.Row="4" Content="Select Def Loc file (.xlsx)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_SelectDefLocXlsx_Click" IsEnabled="True">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#547A80"/>
+                                <GradientStop Color="#F5E9E2" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button x:Name ="B_FillDefLocs" Grid.Column="1" Grid.Row="4" Content="Select Def Loc file (.json)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="140" Height="20" Click="B_FillDefLocs_Click" IsEnabled="True">
                         <Button.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#547A80"/>

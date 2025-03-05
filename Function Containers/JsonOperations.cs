@@ -97,7 +97,7 @@ namespace IgnitionHelper.Function_Containers
             foreach (var token in tokens)
             {
                 tagNames.Add(token["name"]?.Value<string>());
-                if(copiedToken == null && (token["name"]?.Value<string>() == tagNameToMultiply))
+                if (copiedToken == null && (token["name"]?.Value<string>() == tagNameToMultiply))
                 {
                     copiedToken = token;
                 }
@@ -126,6 +126,44 @@ namespace IgnitionHelper.Function_Containers
                 return ex.Message + "\n" + ex.StackTrace;
             }
         }
-
+        public static string MultiplyDefLocs(JObject jsonObj, FileInfo jsonFile, string exportPath, Dictionary<int, string> defLocs)
+        {
+            JArray tagsArray = (JArray)jsonObj["tags"];
+            tagsArray.RemoveAll();
+            foreach (var defLoc in defLocs)
+            {
+                JObject newTag = new JObject
+                {
+                    ["name"] = defLoc.Key.ToString(),
+                    ["typeId"] = "location_UDT",
+                    ["tagType"] = "UdtInstance",
+                    ["tags"] = new JArray
+            {
+                new JObject
+                {
+                    ["value"] = defLoc.Value,
+                    ["name"] = "Name",
+                    ["tagType"] = "AtomicTag"
+                },
+                new JObject
+                {
+                    ["value"] = 0,
+                    ["name"] = "CarId",
+                    ["tagType"] = "AtomicTag"
+                },
+                new JObject
+                {
+                    ["value"] = 8,
+                    ["name"] = "Status",
+                    ["tagType"] = "AtomicTag"
+                }
+            }
+                };
+                tagsArray.Add(newTag);
+            }
+            string newJsonPath = exportPath + @"\" + jsonFile.Name.Replace(".json", "_edit.json");
+            File.WriteAllText(newJsonPath, jsonObj.ToString());
+            return $"Saved new file {newJsonPath}";
+        }
     }
 }

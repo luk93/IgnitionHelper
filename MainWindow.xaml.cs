@@ -35,6 +35,7 @@ namespace IgnitionHelper
     public partial class MainWindow : Window
     {
         public FileInfo? TagsFile;
+        public FileInfo? LocationsFile;
         public FileInfo? XmlFile;
         public FileInfo? JsonFile;
         public XmlDocument XmlDoc;
@@ -45,6 +46,7 @@ namespace IgnitionHelper
         private static string _expFolderPath = @"C:\Users\plradlig\Desktop\Lucid\Ignition\ExportFiles\App_Exp_files";
 
         public List<TagDataPLC> TagDataList { get; set; }
+        public Dictionary<int, string> DefLocs { get; set; }
         public List<VisuTag> VisuTagList { get; set; }
         public Func<Task> DeleteTagsFunc { get; set; }
 
@@ -64,6 +66,29 @@ namespace IgnitionHelper
             DeleteTagsFunc = DeleteTagsAsync;
         }
         #region UI_EventHandlers
+        private async void B_SelectDefLocXlsx_Click(object sender, RoutedEventArgs e)
+        {
+            DisableButtonAndChangeCursor(sender);
+            LocationsFile = SelectXlsxFileAndTryToUse("Select Exported from Studion5000 Tags Table (.xlsx)");
+            if (LocationsFile != null)
+            {
+                TB_Status.AddLine($"Selected: {LocationsFile.FullName}");
+                try
+                {
+                    if (DefLocs?.Count >= 0)
+                        DefLocs.Clear();
+                    DefLocs = await ExcelOperations.LoadDefLocFromExcelFile(LocationsFile);
+                    TB_Status.AddLine($"Acquired {DefLocs.Count} location definitions!");
+                    B_GenerateXml.IsEnabled = true;
+                }
+                catch (Exception ex)
+                {
+                    TB_Status.AddLine($"{ex.Message}");
+                    TB_Status.AddLine($"{ex.StackTrace}");
+                }
+            }
+            EnableButtonAndChangeCursor(sender);
+        }
         private async void B_SelectTagsXLSX_ClickAsync(object sender, RoutedEventArgs e)
         {
             DisableButtonAndChangeCursor(sender);
@@ -329,6 +354,24 @@ namespace IgnitionHelper
                     return;
                 }
                 var result = JsonOperations.MultiplyTag(Json, JsonFile, _expFolderPath, propertyToEdit, nodeNameToMultiply, _textLogg);
+                TB_Status.AddLine(result);
+            }
+        }
+        private void B_FillDefLocs_Click(object sender, RoutedEventArgs e)
+        {
+            if (DefLocs == null)
+            {
+                TB_Status.AddLine("No dictionary do definition of locations!");
+                return;
+            }
+            if (DefLocs.Count == 0)
+            {
+                TB_Status.AddLine("Dictionary do definition of locations empty!");
+                return;
+            }
+            if (JsonFile != null && Json != null)
+            {
+                var result = JsonOperations.MultiplyDefLocs(Json, JsonFile, _expFolderPath, DefLocs);
                 TB_Status.AddLine(result);
             }
         }
